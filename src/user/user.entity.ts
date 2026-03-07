@@ -1,3 +1,5 @@
+import { CURRENT_TIMESTAMP } from '../utils/constants';
+import { UserGender, UserRole } from '../utils/enums';
 import {
   Column,
   CreateDateColumn,
@@ -14,9 +16,39 @@ export class User {
   @Column()
   name: string;
 
-  @CreateDateColumn()
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  password: string;
+
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
+
+  @Column({ nullable: true })
+  age: number;
+
+  @Column({ type: 'enum', enum: UserGender })
+  gender: UserGender;
+
+  @Column({ nullable: true })
+  avatar: string;
+
+  @Column({ unique: true, nullable: true })
+  phoneNumber: string;
+
+  @Column({ nullable: true })
+  address: string;
+
+  @Column({ default: false })
+  isVerified: boolean;
+
+  @Column({ nullable: true })
+  verificationCode: string;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   updatedAt: Date;
 }
