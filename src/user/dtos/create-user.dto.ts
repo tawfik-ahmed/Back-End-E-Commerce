@@ -31,6 +31,7 @@ export class CreateUserDto {
   password: string;
 
   @IsEnum(UserRole, { message: 'Incorrect role' })
+  @IsOptional()
   role: UserRole;
 
   @IsNumber()
@@ -55,5 +56,6 @@ export class CreateUserDto {
   address: string;
 
   @IsEnum(UserGender, { message: 'Incorrect gender' })
+  @IsOptional()
   gender: UserGender;
 }

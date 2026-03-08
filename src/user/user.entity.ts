@@ -28,7 +28,7 @@ export class User {
   @Column({ nullable: true })
   age: number;
 
-  @Column({ type: 'enum', enum: UserGender })
+  @Column({ type: 'enum', enum: UserGender, nullable: true })
   gender: UserGender;
 
   @Column({ nullable: true })
