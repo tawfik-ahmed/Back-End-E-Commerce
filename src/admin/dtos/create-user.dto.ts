@@ -25,7 +25,7 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  @Length(6, 20, {
+  @Length(6, 40, {
     message: 'Password must be at least 6 characters long and no more than 20',
   })
   password: string;
