@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,16 +10,18 @@ import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserRole } from 'src/utils/enums';
 import { JwtPayloadType } from 'src/utils/types';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly config: ConfigService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   /**
@@ -38,7 +42,9 @@ export class UserService {
       });
     }
 
-    const hashedPassword = await this.generateHashedPassword(dto.password);
+    const hashedPassword = await this.authService.generateHashedPassword(
+      dto.password,
+    );
 
     const user = {
       ...dto,
@@ -136,7 +142,9 @@ export class UserService {
     const curUser = { ...dto };
 
     if (dto.password) {
-      const hashedPassword = await this.generateHashedPassword(dto.password);
+      const hashedPassword = await this.authService.generateHashedPassword(
+        dto.password,
+      );
       curUser.password = hashedPassword;
     }
 
@@ -234,24 +242,30 @@ export class UserService {
   }
 
   /**
+   * Retrieves a user by email.
+   *
+   * @throws {NotFoundException} If user does not exist.
+   *
+   * @param {string} email - Email of the user to retrieve.
+   * @returns {Promise<User>} - User object.
+   */
+  public async getUserByEmail(email: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException({ ok: false, message: 'User not found' });
+    }
+
+    return user;
+  }
+
+  /**
    * Check if user with given email already exists.
    *
    * @param {string} email - Email to check.
    * @returns {Promise<boolean>} - True if user exists, false otherwise.
    */
-  private isExistsByEmail(email: string): Promise<boolean> {
+  public isExistsByEmail(email: string): Promise<boolean> {
     return this.userRepository.exists({ where: { email } });
-  }
-
-  /**
-   * Generates a hashed password based on the given password and the salt.
-   *
-   * @param {string} password - Password to hash.
-   * @returns {Promise<string>} - Hashed password.
-   */
-  private async generateHashedPassword(password: string): Promise<string> {
-    const salt = Number(this.config.get<string>('SALT'));
-    const hashedPassword = await bcrypt.hash(password, salt);
-    return hashedPassword;
   }
 }
