@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserRole } from 'src/utils/enums';
+import { JwtPayloadType } from 'src/utils/types';
 
 @Injectable()
 export class UserService {
@@ -163,6 +164,52 @@ export class UserService {
     }
 
     await this.userRepository.remove(user);
+    return { ok: true, message: 'User deleted successfully' };
+  }
+
+  /**
+   * Get the current user based on the jwt payload.
+   *
+   * @returns {Promise<{ ok: boolean, data: User }>} - Object with ok property and user data.
+   */
+  public async getMe(
+    payload: JwtPayloadType,
+  ): Promise<{ ok: boolean; data: User }> {
+    const user = await this.getUserById(payload.id);
+    return { ok: true, data: user };
+  }
+
+  /**
+   * Update the current user.
+   *
+   * @param {JwtPayloadType} payload - Payload of the jwt token.
+   * @param {UpdateUserDto} dto - User data to update.
+   * @returns {Promise<{ ok: boolean, data: User }>} - Object with ok property and user data.
+   */
+  public async updateMe(
+    payload: JwtPayloadType,
+    dto: UpdateUserDto,
+  ): Promise<{ ok: boolean; data: User }> {
+    const user = await this.getUserById(payload.id);
+    const updatedUser = this.userRepository.merge(user, dto);
+    await this.userRepository.save(updatedUser);
+    return { ok: true, data: updatedUser };
+  }
+
+  /**
+   * Soft delete the current user.
+   *
+   * This method will set the user's isActive property to false.
+   *
+   * @param {JwtPayloadType} payload - Payload of the jwt token.
+   * @returns {Promise<{ ok: boolean, message: string }>} - Object with ok property and message.
+   */
+  public async deleteMe(
+    payload: JwtPayloadType,
+  ): Promise<{ ok: boolean; message: string }> {
+    const user = await this.getUserById(payload.id);
+    const updatedUser = this.userRepository.merge(user, { isActive: false });
+    await this.userRepository.save(updatedUser);
     return { ok: true, message: 'User deleted successfully' };
   }
 

@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsNumber,
@@ -58,4 +59,12 @@ export class CreateUserDto {
   @IsEnum(UserGender, { message: 'Incorrect gender' })
   @IsOptional()
   gender: UserGender;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
+
+  @IsString()
+  @IsOptional()
+  verificationCode: string;
 }

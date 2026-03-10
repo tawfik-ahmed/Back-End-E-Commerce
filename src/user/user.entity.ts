@@ -43,7 +43,7 @@ export class User {
   address: string;
 
   @Column({ default: false })
-  isVerified: boolean;
+  isActive: boolean;
 
   @Column({ nullable: true })
   verificationCode: string;

@@ -18,9 +18,11 @@ import { AuthGuard } from './guards/auth.guard';
 import { Roles } from './decorators/roles.decorator';
 import { UserRole } from 'src/utils/enums';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { CurrentUser } from './decorators/current-user.decorator';
+import type { JwtPayloadType } from 'src/utils/types';
 
 @UseInterceptors(ClassSerializerInterceptor)
-@Controller('admins')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -60,5 +62,35 @@ export class UserController {
   @UseGuards(AuthGuard)
   public delete(@Param('id', ParseIntPipe) id: number) {
     return this.userService.deleteUser(id);
+  }
+}
+
+@UseInterceptors(ClassSerializerInterceptor)
+@Controller('users-me')
+export class UserMeController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get()
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public getMe(@CurrentUser() payload: JwtPayloadType) {
+    return this.userService.getMe(payload);
+  }
+
+  @Patch()
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public updateMe(
+    @CurrentUser() payload: JwtPayloadType,
+    @Body() dto: UpdateUserDto,
+  ) {
+    return this.userService.updateMe(payload, dto);
+  }
+
+  @Delete()
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public deleteMe(@CurrentUser() payload: JwtPayloadType) {
+    return this.userService.deleteMe(payload);
   }
 }
