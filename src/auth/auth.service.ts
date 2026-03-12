@@ -156,9 +156,19 @@ export class AuthService {
       });
     }
 
+    const isSame = await bcrypt.compare(newPassword, user.password);
+
+    if (isSame) {
+      throw new BadRequestException({
+        ok: false,
+        message: 'New password must be different from the old one',
+      });
+    }
+
     const hashedPassword = await this.generateHashedPassword(newPassword);
     user.password = hashedPassword;
     user.isCodeVerified = false;
+
     await this.userRepository.save(user);
     return { ok: true, message: 'Password changed successfully' };
   }
