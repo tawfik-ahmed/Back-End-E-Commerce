@@ -141,7 +141,7 @@ export class UserService {
 
     const curUser = { ...dto };
 
-    if (dto.password) {
+    if (dto?.password) {
       const hashedPassword = await this.authService.generateHashedPassword(
         dto.password,
       );

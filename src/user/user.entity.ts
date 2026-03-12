@@ -46,7 +46,12 @@ export class User {
   isActive: boolean;
 
   @Column({ nullable: true })
+  @Exclude()
   verificationCode: string;
+
+  @Column({ default: false })
+  @Exclude()
+  isCodeVerified: boolean;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

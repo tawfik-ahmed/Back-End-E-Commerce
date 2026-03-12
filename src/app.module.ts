@@ -4,13 +4,25 @@ import { UserModule } from './user/user.module';
 import { User } from './user/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
     UserModule,
     AuthModule,
+    MailerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        transport: {
+          service: 'gmail',
+          auth: {
+            user: config.get<string>('STMP_USER'),
+            pass: config.get<string>('STMP_PASSWORD'),
+          },
+        },
+      }),
+    }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'mysql',
