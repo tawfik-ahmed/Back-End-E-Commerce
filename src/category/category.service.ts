@@ -20,7 +20,7 @@ export class CategoryService {
   /**
    * Creates a new category.
    *
-   * @throws {HttpException} If category already exists.
+   * @throws {BadRequestException} If category already exists.
    *
    * @param {CreateCategoryDto} createCategoryDto - Category data.
    * @returns {Promise<{ ok: boolean; data: Category; message: string }>} - Object with ok property, category data and success message.
@@ -32,7 +32,10 @@ export class CategoryService {
     const isExists = await this.categoryRepository.exists({ where: { name } });
 
     if (isExists) {
-      throw new HttpException('Category already exists', 400);
+      throw new BadRequestException({
+        ok: false,
+        message: 'Category already exists',
+      });
     }
 
     const category = this.categoryRepository.create({ name, image });
@@ -134,7 +137,7 @@ export class CategoryService {
    * @param {number} id - Category id.
    * @returns {Promise<Category>} - Category object.
    */
-  private async getCategoryById(id: number): Promise<Category> {
+  public async getCategoryById(id: number): Promise<Category> {
     const category = await this.categoryRepository.findOne({ where: { id } });
 
     if (!category) {

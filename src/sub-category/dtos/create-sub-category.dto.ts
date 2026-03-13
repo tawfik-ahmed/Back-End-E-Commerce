@@ -1,6 +1,6 @@
-import { IsOptional, IsString, IsUrl, Length } from 'class-validator';
+import { IsNumber, IsOptional, IsString, IsUrl, Length } from 'class-validator';
 
-export class CreateCategoryDto {
+export class CreateSubCategoryDto {
   @IsString({ message: 'Name must be a string' })
   @Length(3, 50, {
     message: 'Name must be at least 3 characters long and no more than 50',
@@ -11,4 +11,7 @@ export class CreateCategoryDto {
   @IsUrl({}, { message: 'Image must be a valid url' })
   @IsOptional()
   image: string;
+
+  @IsNumber({}, { message: 'Category must be a number' })
+  categoryId: number;
 }

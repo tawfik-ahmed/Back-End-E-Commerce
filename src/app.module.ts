@@ -7,11 +7,15 @@ import { AuthModule } from './auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CategoryModule } from './category/category.module';
 import { Category } from './category/category.entity';
+import { SubCategory } from './sub-category/sub-category.entity';
+import { SubCategoryModule } from './sub-category/sub-category.module';
 
 @Module({
   imports: [
     UserModule,
     AuthModule,
+    CategoryModule,
+    SubCategoryModule,
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -33,7 +37,7 @@ import { Category } from './category/category.entity';
         username: config.get<string>('DATABASE_USERNAME'),
         database: config.get<string>('DATABASE_NAME'),
         password: config.get<string>('DATABASE_PASSWORD'),
-        entities: [User, Category],
+        entities: [User, Category, SubCategory],
         synchronize: true,
       }),
     }),
@@ -41,7 +45,6 @@ import { Category } from './category/category.entity';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    CategoryModule,
   ],
   controllers: [],
   providers: [],
