@@ -5,6 +5,8 @@ import { User } from './user/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CategoryModule } from './category/category.module';
+import { Category } from './category/category.entity';
 
 @Module({
   imports: [
@@ -31,7 +33,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
         username: config.get<string>('DATABASE_USERNAME'),
         database: config.get<string>('DATABASE_NAME'),
         password: config.get<string>('DATABASE_PASSWORD'),
-        entities: [User],
+        entities: [User, Category],
         synchronize: true,
       }),
     }),
@@ -39,6 +41,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    CategoryModule,
   ],
   controllers: [],
   providers: [],

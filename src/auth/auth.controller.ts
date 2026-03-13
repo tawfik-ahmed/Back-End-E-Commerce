@@ -10,6 +10,7 @@ import { SignUpDto } from './dtos/sign-up.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
 
+// ~ api/v1/auth
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {

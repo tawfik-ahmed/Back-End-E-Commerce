@@ -9,7 +9,6 @@ import { getMetadataArgsStorage, Like, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { ConfigService } from '@nestjs/config';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserRole } from 'src/utils/enums';
 import { JwtPayloadType } from 'src/utils/types';
@@ -19,7 +18,6 @@ import { AuthService } from 'src/auth/auth.service';
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-    private readonly config: ConfigService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
@@ -102,12 +100,8 @@ export class UserService {
       where: conditions,
       order: orderConditions,
       skip: skip && !isNaN(skip) ? Number(skip) : 0,
-      take: limit && !isNaN(limit) ? Math.min(30, Number(limit)) : 30,
+      take: limit && !isNaN(limit) ? Math.min(100, Number(limit)) : 100,
     });
-
-    if (!users || users.length === 0) {
-      throw new NotFoundException({ ok: false, message: 'Users not found' });
-    }
 
     return { ok: true, data: users };
   }
@@ -117,7 +111,7 @@ export class UserService {
    *
    * @returns {Promise<{ ok: boolean, data: User }>} - Object with ok property and user data.
    */
-  public async getOneUser(id: number): Promise<{ ok: boolean; data: User }> {
+  public async getUser(id: number): Promise<{ ok: boolean; data: User }> {
     const user = await this.getUserById(id);
     return { ok: true, data: user };
   }

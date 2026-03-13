@@ -21,6 +21,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { JwtPayloadType } from 'src/utils/types';
 
+// ~ api/v1/users
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')
 export class UserController {
@@ -44,7 +45,7 @@ export class UserController {
   @Roles(UserRole.ADMIN)
   @UseGuards(AuthGuard)
   public findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.getOneUser(id);
+    return this.userService.getUser(id);
   }
 
   @Patch(':id')
