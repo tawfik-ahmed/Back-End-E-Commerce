@@ -9,6 +9,8 @@ import { CategoryModule } from './category/category.module';
 import { Category } from './category/category.entity';
 import { SubCategory } from './sub-category/sub-category.entity';
 import { SubCategoryModule } from './sub-category/sub-category.module';
+import { BrandModule } from './brand/brand.module';
+import { Brand } from './brand/brand.entity';
 
 @Module({
   imports: [
@@ -37,7 +39,7 @@ import { SubCategoryModule } from './sub-category/sub-category.module';
         username: config.get<string>('DATABASE_USERNAME'),
         database: config.get<string>('DATABASE_NAME'),
         password: config.get<string>('DATABASE_PASSWORD'),
-        entities: [User, Category, SubCategory],
+        entities: [User, Category, SubCategory, Brand],
         synchronize: true,
       }),
     }),
@@ -45,6 +47,7 @@ import { SubCategoryModule } from './sub-category/sub-category.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    BrandModule,
   ],
   controllers: [],
   providers: [],
