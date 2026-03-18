@@ -35,7 +35,7 @@ export class BrandController {
 
   @Get(':id')
   public findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.brandService.getOneBrandById(id);
+    return this.brandService.getOneBrand(id);
   }
 
   @Patch(':id')

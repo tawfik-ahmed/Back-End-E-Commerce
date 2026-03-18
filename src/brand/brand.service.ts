@@ -23,7 +23,9 @@ export class BrandService {
    * @param {CreateBrandDto} createBrandDto - Brand data.
    * @returns {Promise<{ ok: boolean; message: string; data: Brand }>} - Object with ok property, brand data and success message.
    */
-  public async createBrand(createBrandDto: CreateBrandDto) {
+  public async createBrand(
+    createBrandDto: CreateBrandDto,
+  ): Promise<{ ok: boolean; message: string; data: Brand }> {
     const isExists = await this.brandRepository.exists({
       where: { name: createBrandDto.name },
     });
@@ -45,7 +47,7 @@ export class BrandService {
    *
    * @returns {Promise<{ ok: boolean, data: Brand[] }>} - Object with ok property and array of brand data.
    */
-  public async getAllBrands() {
+  public async getAllBrands(): Promise<{ ok: boolean; data: Brand[] }> {
     const brands = await this.brandRepository.find();
     return { ok: true, data: brands };
   }
@@ -56,16 +58,11 @@ export class BrandService {
    * @throws {NotFoundException} If brand does not exist.
    *
    * @param {number} id - Brand id.
-   * @returns {Promise<Brand>} - Brand object.
+   * @returns {Promise<{ ok: boolean; data: Brand }>} - Object with ok property and brand data.
    */
-  public async getOneBrandById(id: number) {
-    const brand = await this.brandRepository.findOne({ where: { id } });
-
-    if (!brand) {
-      throw new NotFoundException({ ok: false, message: 'Brand not found' });
-    }
-
-    return brand;
+  public async getOneBrand(id: number): Promise<{ ok: boolean; data: Brand }> {
+    const brand = await this.getOneBrandById(id);
+    return { ok: true, data: brand };
   }
 
   /**
@@ -77,7 +74,10 @@ export class BrandService {
    * @param {UpdateBrandDto} updateBrandDto - Brand data to update.
    * @returns {Promise<{ ok: boolean; message: string; data: Brand }>} - Object with ok property, brand data and success message.
    */
-  public async updateBrand(id: number, updateBrandDto: UpdateBrandDto) {
+  public async updateBrand(
+    id: number,
+    updateBrandDto: UpdateBrandDto,
+  ): Promise<{ ok: boolean; message: string; data: Brand }> {
     const brand = await this.getOneBrandById(id);
     const updatedBrand = this.brandRepository.merge(brand, updateBrandDto);
     await this.brandRepository.save(updatedBrand);
@@ -96,9 +96,29 @@ export class BrandService {
    * @param {number} id - Brand id.
    * @returns {Promise<{ ok: boolean; message: string }>} - Object with ok property and success message.
    */
-  public async deleteBrand(id: number) {
+  public async deleteBrand(
+    id: number,
+  ): Promise<{ ok: boolean; message: string }> {
     const brand = await this.getOneBrandById(id);
     await this.brandRepository.remove(brand);
     return { ok: true, message: 'Brand deleted successfully' };
+  }
+
+  /**
+   * Retrieves a brand by id.
+   *
+   * @throws {NotFoundException} If brand does not exist.
+   *
+   * @param {number} id - Brand id.
+   * @returns {Promise<Brand>} - Brand object.
+   */
+  private async getOneBrandById(id: number): Promise<Brand> {
+    const brand = await this.brandRepository.findOne({ where: { id } });
+
+    if (!brand) {
+      throw new NotFoundException({ ok: false, message: 'Brand not found' });
+    }
+
+    return brand;
   }
 }
