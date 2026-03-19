@@ -13,6 +13,8 @@ import { BrandModule } from './brand/brand.module';
 import { Brand } from './brand/brand.entity';
 import { CouponModule } from './coupon/coupon.module';
 import { Coupon } from './coupon/coupon.entity';
+import { SupplierModule } from './supplier/supplier.module';
+import { Supplier } from './supplier/supplier.entity';
 
 @Module({
   imports: [
@@ -22,14 +24,15 @@ import { Coupon } from './coupon/coupon.entity';
     SubCategoryModule,
     BrandModule,
     CouponModule,
+    SupplierModule,
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         transport: {
           service: 'gmail',
           auth: {
-            user: config.get<string>('STMP_USER'),
-            pass: config.get<string>('STMP_PASSWORD'),
+            user: config.get<string>('SMTP_USER'),
+            pass: config.get<string>('SMTP_PASSWORD'),
           },
         },
       }),
@@ -43,7 +46,7 @@ import { Coupon } from './coupon/coupon.entity';
         username: config.get<string>('DATABASE_USERNAME'),
         database: config.get<string>('DATABASE_NAME'),
         password: config.get<string>('DATABASE_PASSWORD'),
-        entities: [User, Category, SubCategory, Brand, Coupon],
+        entities: [User, Category, SubCategory, Brand, Coupon, Supplier],
         synchronize: true,
       }),
     }),

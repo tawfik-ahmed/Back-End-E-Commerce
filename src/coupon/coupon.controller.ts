@@ -17,6 +17,7 @@ import { Roles } from 'src/user/decorators/roles.decorator';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserRole } from 'src/utils/enums';
 
+// ~api/v1/coupons
 @Controller('coupons')
 export class CouponController {
   constructor(private readonly couponService: CouponService) {}
