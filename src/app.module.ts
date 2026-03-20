@@ -17,17 +17,11 @@ import { SupplierModule } from './supplier/supplier.module';
 import { Supplier } from './supplier/supplier.entity';
 import { RequestProduct } from './request-product/request-product.entity';
 import { RequestProductModule } from './request-product/request-product.module';
+import { TaxModule } from './tax/tax.module';
+import { Tax } from './tax/tax.entity';
 
 @Module({
   imports: [
-    UserModule,
-    AuthModule,
-    CategoryModule,
-    SubCategoryModule,
-    BrandModule,
-    CouponModule,
-    SupplierModule,
-    RequestProductModule,
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -57,6 +51,7 @@ import { RequestProductModule } from './request-product/request-product.module';
           Coupon,
           Supplier,
           RequestProduct,
+          Tax,
         ],
         synchronize: true,
       }),
@@ -65,6 +60,15 @@ import { RequestProductModule } from './request-product/request-product.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    UserModule,
+    AuthModule,
+    CategoryModule,
+    SubCategoryModule,
+    BrandModule,
+    CouponModule,
+    SupplierModule,
+    RequestProductModule,
+    TaxModule,
   ],
   controllers: [],
   providers: [],
