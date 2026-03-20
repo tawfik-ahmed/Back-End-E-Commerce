@@ -225,7 +225,7 @@ export class UserService {
    * @param {number} id - User id.
    * @returns {Promise<User>} - User object.
    */
-  private async getUserById(id: number): Promise<User> {
+  public async getUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (!user) {

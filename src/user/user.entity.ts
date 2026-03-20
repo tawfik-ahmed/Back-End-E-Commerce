@@ -5,9 +5,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { RequestProduct } from 'src/request-product/request-product.entity';
 
 @Entity()
 export class User {
@@ -52,6 +54,9 @@ export class User {
   @Column({ default: false })
   @Exclude()
   isCodeVerified: boolean;
+
+  @OneToMany(() => RequestProduct, (requestProduct) => requestProduct.user)
+  requestProducts: RequestProduct[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

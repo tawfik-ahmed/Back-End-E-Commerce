@@ -15,6 +15,8 @@ import { CouponModule } from './coupon/coupon.module';
 import { Coupon } from './coupon/coupon.entity';
 import { SupplierModule } from './supplier/supplier.module';
 import { Supplier } from './supplier/supplier.entity';
+import { RequestProduct } from './request-product/request-product.entity';
+import { RequestProductModule } from './request-product/request-product.module';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { Supplier } from './supplier/supplier.entity';
     BrandModule,
     CouponModule,
     SupplierModule,
+    RequestProductModule,
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -46,7 +49,15 @@ import { Supplier } from './supplier/supplier.entity';
         username: config.get<string>('DATABASE_USERNAME'),
         database: config.get<string>('DATABASE_NAME'),
         password: config.get<string>('DATABASE_PASSWORD'),
-        entities: [User, Category, SubCategory, Brand, Coupon, Supplier],
+        entities: [
+          User,
+          Category,
+          SubCategory,
+          Brand,
+          Coupon,
+          Supplier,
+          RequestProduct,
+        ],
         synchronize: true,
       }),
     }),
