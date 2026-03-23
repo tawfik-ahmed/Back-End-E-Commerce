@@ -40,10 +40,10 @@ export class Product {
   @Column({ default: 0, nullable: true })
   sold: number;
 
-  @Column()
+  @Column({ default: 1, nullable: true })
   price: number;
 
-  @Column()
+  @Column({ default: 1, nullable: true })
   priceAfterDiscount: number;
 
   @ManyToMany(() => ProductColor, (color) => color.products, { eager: true })

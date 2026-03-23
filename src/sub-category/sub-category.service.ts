@@ -167,7 +167,7 @@ export class SubCategoryService {
    * @param {number} id - SubCategory id.
    * @returns {Promise<SubCategory>} - SubCategory object.
    */
-  private async getSubCategoryById(id: number): Promise<SubCategory> {
+  public async getSubCategoryById(id: number): Promise<SubCategory> {
     const subCategory = await this.subCategoryRepository.findOne({
       where: { id },
     });

@@ -112,7 +112,7 @@ export class BrandService {
    * @param {number} id - Brand id.
    * @returns {Promise<Brand>} - Brand object.
    */
-  private async getOneBrandById(id: number): Promise<Brand> {
+  public async getOneBrandById(id: number): Promise<Brand> {
     const brand = await this.brandRepository.findOne({ where: { id } });
 
     if (!brand) {
