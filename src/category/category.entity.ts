@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Product } from 'src/product/entites/product.entity';
 
 @Entity()
 export class Category {
@@ -22,6 +23,9 @@ export class Category {
 
   @OneToMany(() => SubCategory, (subCategory) => subCategory.category)
   subCategories: SubCategory[];
+
+  @OneToMany(() => Product, (product) => product.category)
+  products: Product[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

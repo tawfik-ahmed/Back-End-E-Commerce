@@ -1,8 +1,10 @@
+import { Product } from 'src/product/entites/product.entity';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,6 +19,9 @@ export class Brand {
 
   @Column({ nullable: true })
   image: string;
+
+  @OneToMany(() => Product, (product) => product.brand)
+  products: Product[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

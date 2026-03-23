@@ -19,6 +19,10 @@ import { RequestProduct } from './request-product/request-product.entity';
 import { RequestProductModule } from './request-product/request-product.module';
 import { TaxModule } from './tax/tax.module';
 import { Tax } from './tax/tax.entity';
+import { ProductModule } from './product/product.module';
+import { Product } from './product/entites/product.entity';
+import { ProductColor } from './product/entites/product-color.entity';
+import { ProductImage } from './product/entites/product-image.entity';
 
 @Module({
   imports: [
@@ -52,6 +56,9 @@ import { Tax } from './tax/tax.entity';
           Supplier,
           RequestProduct,
           Tax,
+          Product,
+          ProductColor,
+          ProductImage,
         ],
         synchronize: true,
       }),
@@ -69,6 +76,7 @@ import { Tax } from './tax/tax.entity';
     SupplierModule,
     RequestProductModule,
     TaxModule,
+    ProductModule,
   ],
   controllers: [],
   providers: [],
