@@ -1,6 +1,6 @@
-import { Category } from 'src/category/category.entity';
-import { SubCategory } from 'src/sub-category/sub-category.entity';
-import { Brand } from 'src/brand/brand.entity';
+import { Category } from 'src/category/entites/category.entity';
+import { SubCategory } from 'src/sub-category/entites/sub-category.entity';
+import { Brand } from 'src/brand/entites/brand.entity';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,

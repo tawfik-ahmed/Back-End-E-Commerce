@@ -1,4 +1,4 @@
-import { User } from 'src/user/user.entity';
+import { User } from 'src/user/entites/user.entity';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,

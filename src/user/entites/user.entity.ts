@@ -1,6 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { CURRENT_TIMESTAMP } from '../utils/constants';
-import { UserGender, UserRole } from '../utils/enums';
+import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,
   CreateDateColumn,
@@ -9,7 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { RequestProduct } from 'src/request-product/request-product.entity';
+import { RequestProduct } from 'src/request-product/entites/request-product.entity';
+import { UserGender, UserRole } from '../../utils/enums';
 
 @Entity()
 export class User {

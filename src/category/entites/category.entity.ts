@@ -1,5 +1,5 @@
-import { SubCategory } from 'src/sub-category/sub-category.entity';
-import { CURRENT_TIMESTAMP } from '../utils/constants';
+import { SubCategory } from 'src/sub-category/entites/sub-category.entity';
+import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,
   CreateDateColumn,

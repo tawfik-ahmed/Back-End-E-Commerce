@@ -6,7 +6,7 @@ import {
 import { CreateSubCategoryDto } from './dtos/create-sub-category.dto';
 import { UpdateSubCategoryDto } from './dtos/update-sub-category.dto';
 import { EntityManager, Repository } from 'typeorm';
-import { SubCategory } from './sub-category.entity';
+import { SubCategory } from './entites/sub-category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryService } from 'src/category/category.service';
 

@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RequestProduct } from './request-product.entity';
+import { RequestProduct } from './entites/request-product.entity';
 import { Repository } from 'typeorm';
 import { CreateRequestProductDto } from './dtos/create-request-product.dto';
 import { UserService } from '../user/user.service';

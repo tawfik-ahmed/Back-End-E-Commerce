@@ -1,28 +1,28 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { User } from './user/user.entity';
+import { User } from './user/entites/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CategoryModule } from './category/category.module';
-import { Category } from './category/category.entity';
-import { SubCategory } from './sub-category/sub-category.entity';
+import { Category } from './category/entites/category.entity';
 import { SubCategoryModule } from './sub-category/sub-category.module';
 import { BrandModule } from './brand/brand.module';
-import { Brand } from './brand/brand.entity';
+import { Brand } from './brand/entites/brand.entity';
 import { CouponModule } from './coupon/coupon.module';
-import { Coupon } from './coupon/coupon.entity';
+import { Coupon } from './coupon/entites/coupon.entity';
 import { SupplierModule } from './supplier/supplier.module';
-import { Supplier } from './supplier/supplier.entity';
-import { RequestProduct } from './request-product/request-product.entity';
+import { Supplier } from './supplier/entites/supplier.entity';
+import { RequestProduct } from './request-product/entites/request-product.entity';
 import { RequestProductModule } from './request-product/request-product.module';
 import { TaxModule } from './tax/tax.module';
-import { Tax } from './tax/tax.entity';
+import { Tax } from './tax/entites/tax.entity';
 import { ProductModule } from './product/product.module';
 import { Product } from './product/entites/product.entity';
 import { ProductColor } from './product/entites/product-color.entity';
 import { ProductImage } from './product/entites/product-image.entity';
+import { SubCategory } from './sub-category/entites/sub-category.entity';
 
 @Module({
   imports: [

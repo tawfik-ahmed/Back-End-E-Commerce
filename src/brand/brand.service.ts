@@ -6,7 +6,7 @@ import {
 import { CreateBrandDto } from './dtos/create-brand.dto';
 import { UpdateBrandDto } from './dtos/update-brand.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brand } from './brand.entity';
+import { Brand } from './entites/brand.entity';
 import { EntityManager, Repository } from 'typeorm';
 
 @Injectable()
