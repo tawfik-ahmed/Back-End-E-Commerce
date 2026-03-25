@@ -9,16 +9,22 @@ import { ProductColor } from './entites/product-color.entity';
 import { CategoryService } from '../category/category.service';
 import { SubCategoryService } from 'src/sub-category/sub-category.service';
 import { BrandService } from 'src/brand/brand.service';
-import { Category } from 'src/category/category.entity';
-import { SubCategory } from 'src/sub-category/sub-category.entity';
-import { Brand } from 'src/brand/brand.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(ProductImage)
+    private readonly productImageRepository: Repository<ProductImage>,
+    @InjectRepository(ProductColor)
+    private readonly productColorRepository: Repository<ProductColor>,
+
     private readonly dataSource: DataSource,
+
+    private readonly categoryService: CategoryService,
+    private readonly subCategoryService: SubCategoryService,
+    private readonly brandService: BrandService,
   ) {}
 
   /**
@@ -126,17 +132,7 @@ export class ProductService {
    */
   public async updateProduct(id: number, updateProductDto: UpdateProductDto) {
     return await this.dataSource.transaction(async (manager: EntityManager) => {
-      const productRepository = manager.getRepository(Product);
-      let product = await productRepository.findOne({
-        where: { id },
-      });
-
-      if (!product) {
-        throw new BadRequestException({
-          ok: false,
-          message: 'Product not found',
-        });
-      }
+      let product = await this.getProductById(id, manager);
 
       const {
         title,
@@ -147,6 +143,8 @@ export class ProductService {
         brandId,
         ...rest
       } = updateProductDto;
+
+      const productRepository = manager.getRepository(Product);
 
       if (title && title !== product.title) {
         const isExists = await productRepository.exists({
@@ -218,8 +216,11 @@ export class ProductService {
    * @param {number} id - Product id.
    * @returns {Promise<Product>} - Product object.
    */
-  private async getProductById(id: number) {
-    const product = await this.productRepository.findOne({ where: { id } });
+  private async getProductById(id: number, manager?: EntityManager) {
+    const repo = manager
+      ? manager.getRepository(Product)
+      : this.productRepository;
+    const product = await repo.findOne({ where: { id } });
 
     if (!product) {
       throw new BadRequestException({
@@ -248,14 +249,10 @@ export class ProductService {
     brandId: number,
     manager: EntityManager,
   ) {
-    const categoryRepository = manager.getRepository(Category);
-    const subCategoryRepository = manager.getRepository(SubCategory);
-    const brandRepository = manager.getRepository(Brand);
-
     const [category, subCategory, brand] = await Promise.all([
-      categoryRepository.findOne({ where: { id: categoryId } }),
-      subCategoryRepository.findOne({ where: { id: subCategoryId } }),
-      brandRepository.findOne({ where: { id: brandId } }),
+      this.categoryService.getCategoryById(categoryId, manager),
+      this.subCategoryService.getSubCategoryById(subCategoryId, manager),
+      this.brandService.getOneBrandById(brandId, manager),
     ]);
 
     let missing: string[] = [];
@@ -288,10 +285,12 @@ export class ProductService {
    * @param {string[]} colors - Array of product color names.
    * @returns {Promise<void>} - Promise which resolves when the operation is completed.
    */
-  private async upsertColors(colors: string[], manager: EntityManager) {
-    const productColorRepository = manager.getRepository(ProductColor);
-    await productColorRepository.upsert(
-      colors.map((name) => ({ name })),
+  private async upsertColors(colors: string[], manager?: EntityManager) {
+    const repo = manager
+      ? manager.getRepository(ProductColor)
+      : this.productColorRepository;
+    return repo.upsert(
+      colors.map((color) => ({ name: color })),
       ['name'],
     );
   }
@@ -302,9 +301,11 @@ export class ProductService {
    * @param {string[]} colors - Array of product color names.
    * @returns {Promise<ProductColor[]>} - Promise which resolves with an array of product color entities.
    */
-  private async getColorsEntites(colors: string[], manager: EntityManager) {
-    const productColorRepository = manager.getRepository(ProductColor);
-    return productColorRepository.find({ where: { name: In(colors) } });
+  private async getColorsEntites(colors: string[], manager?: EntityManager) {
+    const repo = manager
+      ? manager.getRepository(ProductColor)
+      : this.productColorRepository;
+    return repo.find({ where: { name: In(colors) } });
   }
 
   /**
@@ -313,9 +314,11 @@ export class ProductService {
    * @param {string[]} images - Array of product image urls.
    * @returns {Promise<void>} - Promise which resolves when the operation is completed.
    */
-  private upsertImages(images: string[], manager: EntityManager) {
-    const productImageRepository = manager.getRepository(ProductImage);
-    return productImageRepository.upsert(
+  private upsertImages(images: string[], manager?: EntityManager) {
+    const repo = manager
+      ? manager.getRepository(ProductImage)
+      : this.productImageRepository;
+    return repo.upsert(
       images.map((url) => ({ url })),
       ['url'],
     );
@@ -327,8 +330,10 @@ export class ProductService {
    * @param {string[]} images - Array of product image urls.
    * @returns {Promise<ProductImage[]>} - Promise which resolves with an array of product image entities.
    */
-  private getImagesEntites(images: string[], manager: EntityManager) {
-    const productImageRepository = manager.getRepository(ProductImage);
-    return productImageRepository.find({ where: { url: In(images) } });
+  private getImagesEntites(images: string[], manager?: EntityManager) {
+    const repo = manager
+      ? manager.getRepository(ProductImage)
+      : this.productImageRepository;
+    return repo.find({ where: { url: In(images) } });
   }
 }

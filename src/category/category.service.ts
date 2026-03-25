@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Category } from './category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -137,8 +137,14 @@ export class CategoryService {
    * @param {number} id - Category id.
    * @returns {Promise<Category>} - Category object.
    */
-  public async getCategoryById(id: number): Promise<Category> {
-    const category = await this.categoryRepository.findOne({ where: { id } });
+  public async getCategoryById(
+    id: number,
+    manager?: EntityManager,
+  ): Promise<Category> {
+    const repo = manager
+      ? manager.getRepository(Category)
+      : this.categoryRepository;
+    const category = await repo.findOne({ where: { id } });
 
     if (!category) {
       throw new NotFoundException({ ok: false, message: 'Category not found' });

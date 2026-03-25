@@ -34,7 +34,7 @@ export class Product {
   @Column()
   imageCover: string;
 
-  @OneToMany(() => ProductImage, (image) => image.product, { cascade: true })
+  @OneToMany(() => ProductImage, (image) => image.product, { eager: true })
   images: ProductImage[];
 
   @Column({ default: 0, nullable: true })

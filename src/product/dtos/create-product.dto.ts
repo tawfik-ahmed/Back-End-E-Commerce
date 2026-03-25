@@ -6,6 +6,7 @@ import {
   IsUrl,
   Length,
   Min,
+  MinLength,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -16,7 +17,7 @@ export class CreateProductDto {
   title: string;
 
   @IsString({ message: 'description must be a string' })
-  @Min(20, { message: 'description must be at least 20 characters long' })
+  @MinLength(20, { message: 'description must be at least 20 characters long' })
   description: string;
 
   @IsNumber({}, { message: 'price must be a number' })
@@ -44,7 +45,7 @@ export class CreateProductDto {
   priceAfterDiscount: number;
 
   @IsArray({ message: 'colors must be an array' })
-  @IsUrl({}, { message: 'colors must be an array of strings', each: true })
+  @IsString({ each: true, message: 'each color must be a string' })
   @IsOptional()
   colors: Array<string>;
 

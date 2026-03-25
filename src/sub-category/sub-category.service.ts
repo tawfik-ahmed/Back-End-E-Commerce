@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateSubCategoryDto } from './dtos/create-sub-category.dto';
 import { UpdateSubCategoryDto } from './dtos/update-sub-category.dto';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { SubCategory } from './sub-category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryService } from 'src/category/category.service';
@@ -167,8 +167,14 @@ export class SubCategoryService {
    * @param {number} id - SubCategory id.
    * @returns {Promise<SubCategory>} - SubCategory object.
    */
-  public async getSubCategoryById(id: number): Promise<SubCategory> {
-    const subCategory = await this.subCategoryRepository.findOne({
+  public async getSubCategoryById(
+    id: number,
+    manager?: EntityManager,
+  ): Promise<SubCategory> {
+    const repo = manager
+      ? manager.getRepository(SubCategory)
+      : this.subCategoryRepository;
+    const subCategory = await repo.findOne({
       where: { id },
     });
 

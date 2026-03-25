@@ -7,7 +7,7 @@ import { CreateBrandDto } from './dtos/create-brand.dto';
 import { UpdateBrandDto } from './dtos/update-brand.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brand } from './brand.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class BrandService {
@@ -112,8 +112,12 @@ export class BrandService {
    * @param {number} id - Brand id.
    * @returns {Promise<Brand>} - Brand object.
    */
-  public async getOneBrandById(id: number): Promise<Brand> {
-    const brand = await this.brandRepository.findOne({ where: { id } });
+  public async getOneBrandById(
+    id: number,
+    manager?: EntityManager,
+  ): Promise<Brand> {
+    const repo = manager ? manager.getRepository(Brand) : this.brandRepository;
+    const brand = await repo.findOne({ where: { id } });
 
     if (!brand) {
       throw new NotFoundException({ ok: false, message: 'Brand not found' });
