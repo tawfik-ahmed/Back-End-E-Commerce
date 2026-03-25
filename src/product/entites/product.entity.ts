@@ -34,7 +34,7 @@ export class Product {
   @Column()
   imageCover: string;
 
-  @OneToMany(() => ProductImage, (image) => image.product, { eager: true })
+  @OneToMany(() => ProductImage, (image) => image.product)
   images: ProductImage[];
 
   @Column({ default: 0, nullable: true })
@@ -46,7 +46,7 @@ export class Product {
   @Column({ default: 1, nullable: true })
   priceAfterDiscount: number;
 
-  @ManyToMany(() => ProductColor, (color) => color.products, { eager: true })
+  @ManyToMany(() => ProductColor, (color) => color.products)
   @JoinTable()
   colors: ProductColor[];
 
@@ -56,15 +56,13 @@ export class Product {
   @Column({ default: 0, nullable: true })
   ratingsQuantity: number;
 
-  @ManyToOne(() => Category, (category) => category.products, { eager: true })
+  @ManyToOne(() => Category, (category) => category.products)
   category: Category;
 
-  @ManyToOne(() => SubCategory, (subCategory) => subCategory.products, {
-    eager: true,
-  })
+  @ManyToOne(() => SubCategory, (subCategory) => subCategory.products)
   subCategory: SubCategory;
 
-  @ManyToOne(() => Brand, (brand) => brand.products, { eager: true })
+  @ManyToOne(() => Brand, (brand) => brand.products)
   brand: Brand;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })

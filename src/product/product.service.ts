@@ -3,7 +3,17 @@ import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entites/product.entity';
-import { DataSource, EntityManager, In, Repository } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  EntityManager,
+  getMetadataArgsStorage,
+  In,
+  LessThanOrEqual,
+  Like,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import { ProductImage } from './entites/product-image.entity';
 import { ProductColor } from './entites/product-color.entity';
 import { CategoryService } from '../category/category.service';
@@ -105,8 +115,107 @@ export class ProductService {
    *
    * @returns {Promise<{ ok: boolean, data: Product[] }>} - Object with ok property and array of product data.
    */
-  public async getAllProducts() {
-    const products = await this.productRepository.find();
+  public async getAllProducts(query: any) {
+    const {
+      page,
+      limit,
+      sort,
+      term = 'ASC',
+      keyword,
+      price,
+      sold,
+      averageRating,
+      categoryId,
+      subCategoryId,
+      brandId,
+    } = query;
+
+    const conditions: any = {};
+
+    // keyword
+    if (keyword) {
+      conditions.title = Like(`%${keyword}%`);
+    }
+
+    const toNumber = (value: any): number | null => {
+      const num = Number(value);
+      return isNaN(num) ? null : num;
+    };
+
+    // price
+    const priceGte = toNumber(price?.gte);
+    const priceLte = toNumber(price?.lte);
+
+    if (priceGte !== null && priceLte !== null) {
+      conditions.price = Between(priceGte, priceLte);
+    } else if (priceGte !== null) {
+      conditions.price = MoreThanOrEqual(priceGte);
+    } else if (priceLte !== null) {
+      conditions.price = LessThanOrEqual(priceLte);
+    }
+
+    // sold
+    const soldGte = toNumber(sold?.gte);
+    const soldLte = toNumber(sold?.lte);
+
+    if (soldGte !== null && soldLte !== null) {
+      conditions.sold = Between(soldGte, soldLte);
+    } else if (soldGte !== null) {
+      conditions.sold = MoreThanOrEqual(soldGte);
+    } else if (soldLte !== null) {
+      conditions.sold = LessThanOrEqual(soldLte);
+    }
+
+    // rating
+    const ratingGte = toNumber(averageRating?.gte);
+    const ratingLte = toNumber(averageRating?.lte);
+
+    if (ratingGte !== null && ratingLte !== null) {
+      conditions.averageRating = Between(ratingGte, ratingLte);
+    } else if (ratingGte !== null) {
+      conditions.averageRating = MoreThanOrEqual(ratingGte);
+    } else if (ratingLte !== null) {
+      conditions.averageRating = LessThanOrEqual(ratingLte);
+    }
+
+    // relations
+    const category = toNumber(categoryId);
+    if (category !== null) conditions.category = { id: category };
+
+    const subCategory = toNumber(subCategoryId);
+    if (subCategory !== null) conditions.subCategory = { id: subCategory };
+
+    const brand = toNumber(brandId);
+    if (brand !== null) conditions.brand = { id: brand };
+
+    // sorting
+    const validColumns = getMetadataArgsStorage()
+      .columns.filter((col) => col.target === Product)
+      .map((col) => col.propertyName);
+
+    const order: any = {};
+
+    if (sort && validColumns.includes(sort)) {
+      const upperCaseTerm = term.toUpperCase();
+      const isValidTerm = ['ASC', 'DESC'].includes(upperCaseTerm);
+      order[sort] = isValidTerm ? upperCaseTerm : 'ASC';
+    }
+
+    // pagination
+    const take = limit && !isNaN(limit) ? Math.min(100, Number(limit)) : 100;
+    const skip =
+      page && limit && !isNaN(page) && !isNaN(limit)
+        ? (Number(page) - 1) * Number(limit)
+        : 0;
+
+    const products = await this.productRepository.find({
+      where: conditions,
+      order,
+      skip,
+      take,
+      relations: ['category', 'subCategory', 'brand', 'images', 'colors'],
+    });
+
     return { ok: true, data: products };
   }
 
@@ -220,7 +329,10 @@ export class ProductService {
     const repo = manager
       ? manager.getRepository(Product)
       : this.productRepository;
-    const product = await repo.findOne({ where: { id } });
+    const product = await repo.findOne({
+      where: { id },
+      relations: ['category', 'subCategory', 'brand', 'images', 'colors'],
+    });
 
     if (!product) {
       throw new BadRequestException({

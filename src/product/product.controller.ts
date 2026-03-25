@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
@@ -29,8 +30,8 @@ export class ProductController {
   }
 
   @Get()
-  public findAll() {
-    return this.productService.getAllProducts();
+  public findAll(@Query() query: any) {
+    return this.productService.getAllProducts(query);
   }
 
   @Get(':id')

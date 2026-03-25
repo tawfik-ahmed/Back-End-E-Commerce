@@ -67,7 +67,9 @@ export class RequestProductService {
     ok: boolean;
     data: RequestProduct[];
   }> {
-    const requestProducts = await this.requestProductRepository.find();
+    const requestProducts = await this.requestProductRepository.find({
+      relations: ['user'],
+    });
     return { ok: true, data: requestProducts };
   }
 
@@ -176,6 +178,7 @@ export class RequestProductService {
   private async getRequestProductById(id: number): Promise<RequestProduct> {
     const requestProduct = await this.requestProductRepository.findOne({
       where: { id },
+      relations: ['user'],
     });
 
     if (!requestProduct) {

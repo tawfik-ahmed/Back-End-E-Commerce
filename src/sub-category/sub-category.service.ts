@@ -66,7 +66,9 @@ export class SubCategoryService {
     ok: boolean;
     data: SubCategory[];
   }> {
-    const subCategories = await this.subCategoryRepository.find();
+    const subCategories = await this.subCategoryRepository.find({
+      relations: ['category'],
+    });
     return { ok: true, data: subCategories };
   }
 
@@ -176,6 +178,7 @@ export class SubCategoryService {
       : this.subCategoryRepository;
     const subCategory = await repo.findOne({
       where: { id },
+      relations: ['category'],
     });
 
     if (!subCategory) {

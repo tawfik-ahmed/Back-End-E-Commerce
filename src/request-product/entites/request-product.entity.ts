@@ -26,7 +26,7 @@ export class RequestProduct {
   @Column({ default: null })
   category: string;
 
-  @ManyToOne(() => User, (user) => user.requestProducts, { eager: true })
+  @ManyToOne(() => User, (user) => user.requestProducts)
   user: User;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
