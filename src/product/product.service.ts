@@ -3,26 +3,22 @@ import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entites/product.entity';
-import { In, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { ProductImage } from './entites/product-image.entity';
 import { ProductColor } from './entites/product-color.entity';
 import { CategoryService } from '../category/category.service';
 import { SubCategoryService } from 'src/sub-category/sub-category.service';
 import { BrandService } from 'src/brand/brand.service';
+import { Category } from 'src/category/category.entity';
+import { SubCategory } from 'src/sub-category/sub-category.entity';
+import { Brand } from 'src/brand/brand.entity';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    @InjectRepository(ProductImage)
-    private readonly productImageRepository: Repository<ProductImage>,
-    @InjectRepository(ProductColor)
-    private readonly productColorRepository: Repository<ProductColor>,
-
-    private readonly categoryService: CategoryService,
-    private readonly subCategoryService: SubCategoryService,
-    private readonly brandService: BrandService,
+    private readonly dataSource: DataSource,
   ) {}
 
   /**
@@ -43,48 +39,59 @@ export class ProductService {
       brandId,
       ...rest
     } = createProductDto;
-    const isExists = await this.productRepository.exists({ where: { title } });
 
-    if (isExists) {
-      throw new BadRequestException({
-        ok: false,
-        message: 'Product already exists',
+    return await this.dataSource.transaction(async (manager: EntityManager) => {
+      const productRepository = manager.getRepository(Product);
+
+      const isExists = await productRepository.exists({
+        where: { title },
       });
-    }
 
-    const [category, subCategory, brand] =
-      await this.getCategorySubCategoryBrandEntities(
-        categoryId,
-        subCategoryId,
-        brandId,
-      );
+      if (isExists) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Product already exists',
+        });
+      }
 
-    let colorsEntities: ProductColor[] = [];
+      const [category, subCategory, brand] =
+        await this.getCategorySubCategoryBrandEntities(
+          categoryId,
+          subCategoryId,
+          brandId,
+          manager,
+        );
+      let colorsEntities: ProductColor[] = [];
 
-    if (colors && colors?.length > 0) {
-      await this.upsertColors(colors);
-      colorsEntities = await this.getColorsEntites(colors);
-    }
+      if (colors && colors?.length > 0) {
+        await this.upsertColors(colors, manager);
+        colorsEntities = await this.getColorsEntites(colors, manager);
+      }
 
-    let imagesEntities: ProductImage[] = [];
+      let imagesEntities: ProductImage[] = [];
 
-    if (images && images?.length > 0) {
-      await this.upsertImages(images);
-      imagesEntities = await this.getImagesEntites(images);
-    }
+      if (images && images?.length > 0) {
+        await this.upsertImages(images, manager);
+        imagesEntities = await this.getImagesEntites(images, manager);
+      }
 
-    const product = this.productRepository.create({
-      title,
-      ...rest,
-      category,
-      subCategory,
-      brand,
-      images: imagesEntities,
-      colors: colorsEntities,
+      const product = productRepository.create({
+        title,
+        ...rest,
+        category,
+        subCategory,
+        brand,
+        images: imagesEntities,
+        colors: colorsEntities,
+      });
+      await productRepository.save(product);
+
+      return {
+        ok: true,
+        data: product,
+        message: 'Product created successfully',
+      };
     });
-
-    await this.productRepository.save(product);
-    return { ok: true, data: product, message: 'Product created successfully' };
   }
 
   /**
@@ -118,62 +125,75 @@ export class ProductService {
    * @returns {Promise<{ ok: boolean, data: Product, message: string }>} - Object with ok property, product data and success message.
    */
   public async updateProduct(id: number, updateProductDto: UpdateProductDto) {
-    const product = await this.getProductById(id);
-
-    const {
-      title,
-      colors,
-      images,
-      categoryId,
-      subCategoryId,
-      brandId,
-      ...rest
-    } = updateProductDto;
-
-    if (title && title !== product.title) {
-      const isExists = await this.productRepository.exists({
-        where: { title },
+    return await this.dataSource.transaction(async (manager: EntityManager) => {
+      const productRepository = manager.getRepository(Product);
+      let product = await productRepository.findOne({
+        where: { id },
       });
 
-      if (isExists) {
+      if (!product) {
         throw new BadRequestException({
           ok: false,
-          message: 'Product with this title already exists',
+          message: 'Product not found',
         });
       }
-    }
 
-    if (categoryId) {
-      product.category = await this.categoryService.getCategoryById(categoryId);
-    }
+      const {
+        title,
+        colors,
+        images,
+        categoryId,
+        subCategoryId,
+        brandId,
+        ...rest
+      } = updateProductDto;
 
-    if (subCategoryId) {
-      product.subCategory =
-        await this.subCategoryService.getSubCategoryById(subCategoryId);
-    }
+      if (title && title !== product.title) {
+        const isExists = await productRepository.exists({
+          where: { title },
+        });
 
-    if (brandId) {
-      product.brand = await this.brandService.getOneBrandById(brandId);
-    }
+        if (isExists) {
+          throw new BadRequestException({
+            ok: false,
+            message: 'Product with this title already exists',
+          });
+        }
+      }
 
-    if (colors && colors?.length > 0) {
-      await this.upsertColors(colors);
-      product.colors = await this.getColorsEntites(colors);
-    }
+      const [category, subCategory, brand] =
+        await this.getCategorySubCategoryBrandEntities(
+          categoryId ?? product.category.id,
+          subCategoryId ?? product.subCategory.id,
+          brandId ?? product.brand.id,
+          manager,
+        );
 
-    if (images && images?.length > 0) {
-      await this.upsertImages(images);
-      product.images = await this.getImagesEntites(images);
-    }
+      if (colors && colors?.length > 0) {
+        await this.upsertColors(colors, manager);
+        product.colors = await this.getColorsEntites(colors, manager);
+      }
 
-    this.productRepository.merge(product, { title, ...rest });
-    await this.productRepository.save(product);
+      if (images && images?.length > 0) {
+        await this.upsertImages(images, manager);
+        product.images = await this.getImagesEntites(images, manager);
+      }
 
-    return {
-      ok: true,
-      data: product,
-      message: 'Product updated successfully',
-    };
+      product = productRepository.merge(product, {
+        title,
+        ...rest,
+        category,
+        subCategory,
+        brand,
+      });
+      await productRepository.save(product);
+
+      return {
+        ok: true,
+        data: product,
+        message: 'Product updated successfully',
+      };
+    });
   }
 
   /**
@@ -226,11 +246,16 @@ export class ProductService {
     categoryId: number,
     subCategoryId: number,
     brandId: number,
+    manager: EntityManager,
   ) {
+    const categoryRepository = manager.getRepository(Category);
+    const subCategoryRepository = manager.getRepository(SubCategory);
+    const brandRepository = manager.getRepository(Brand);
+
     const [category, subCategory, brand] = await Promise.all([
-      this.categoryService.getCategoryById(categoryId),
-      this.subCategoryService.getSubCategoryById(subCategoryId),
-      this.brandService.getOneBrandById(brandId),
+      categoryRepository.findOne({ where: { id: categoryId } }),
+      subCategoryRepository.findOne({ where: { id: subCategoryId } }),
+      brandRepository.findOne({ where: { id: brandId } }),
     ]);
 
     let missing: string[] = [];
@@ -263,8 +288,9 @@ export class ProductService {
    * @param {string[]} colors - Array of product color names.
    * @returns {Promise<void>} - Promise which resolves when the operation is completed.
    */
-  private async upsertColors(colors: string[]) {
-    await this.productColorRepository.upsert(
+  private async upsertColors(colors: string[], manager: EntityManager) {
+    const productColorRepository = manager.getRepository(ProductColor);
+    await productColorRepository.upsert(
       colors.map((name) => ({ name })),
       ['name'],
     );
@@ -276,8 +302,9 @@ export class ProductService {
    * @param {string[]} colors - Array of product color names.
    * @returns {Promise<ProductColor[]>} - Promise which resolves with an array of product color entities.
    */
-  private async getColorsEntites(colors: string[]) {
-    return this.productColorRepository.find({ where: { name: In(colors) } });
+  private async getColorsEntites(colors: string[], manager: EntityManager) {
+    const productColorRepository = manager.getRepository(ProductColor);
+    return productColorRepository.find({ where: { name: In(colors) } });
   }
 
   /**
@@ -286,8 +313,9 @@ export class ProductService {
    * @param {string[]} images - Array of product image urls.
    * @returns {Promise<void>} - Promise which resolves when the operation is completed.
    */
-  private upsertImages(images: string[]) {
-    return this.productImageRepository.upsert(
+  private upsertImages(images: string[], manager: EntityManager) {
+    const productImageRepository = manager.getRepository(ProductImage);
+    return productImageRepository.upsert(
       images.map((url) => ({ url })),
       ['url'],
     );
@@ -299,7 +327,8 @@ export class ProductService {
    * @param {string[]} images - Array of product image urls.
    * @returns {Promise<ProductImage[]>} - Promise which resolves with an array of product image entities.
    */
-  private getImagesEntites(images: string[]) {
-    return this.productImageRepository.find({ where: { url: In(images) } });
+  private getImagesEntites(images: string[], manager: EntityManager) {
+    const productImageRepository = manager.getRepository(ProductImage);
+    return productImageRepository.find({ where: { url: In(images) } });
   }
 }
