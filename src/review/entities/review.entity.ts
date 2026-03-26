@@ -7,10 +7,12 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
+@Unique(['user', 'product'])
 export class Review {
   @PrimaryGeneratedColumn()
   id: number;
@@ -18,13 +20,13 @@ export class Review {
   @Column({ nullable: true })
   reviewText: string;
 
-  @Column()
+  @Column({type: 'int'})
   rating: number;
 
-  @ManyToOne(() => User, (user) => user.reviews)
+  @ManyToOne(() => User, (user) => user.reviews, {onDelete: 'CASCADE'})
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.reviews)
+  @ManyToOne(() => Product, (product) => product.reviews, {onDelete: 'CASCADE'})
   product: Product;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })

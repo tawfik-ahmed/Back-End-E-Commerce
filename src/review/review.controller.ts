@@ -15,6 +15,8 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { Roles } from 'src/user/decorators/roles.decorator';
 import { UserRole } from 'src/utils/enums';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CurrentUser } from 'src/user/decorators/current-user.decorator';
+import type { JwtPayloadType } from 'src/utils/types';
 
 // ~api/v1/reviews
 @Controller('reviews')
@@ -24,18 +26,26 @@ export class ReviewController {
   @Post()
   @Roles(UserRole.ADMIN, UserRole.USER)
   @UseGuards(AuthGuard)
-  public create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewService.createReview(createReviewDto);
+  public create(
+    @Body() createReviewDto: CreateReviewDto,
+    @CurrentUser() payload: JwtPayloadType,
+  ) {
+    return this.reviewService.createReview(createReviewDto, payload.id);
   }
 
-  @Get()
-  public findAll() {
-    return this.reviewService.getAllReviews();
+  @Get(':productId')
+  public findAll(@Param('productId', ParseIntPipe) productId: number) {
+    return this.reviewService.getAllProductReviews(productId);
   }
 
-  @Get(':id')
-  public findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewService.getReview(id);
+  @Get(':productId/:userId')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public findOne(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.reviewService.getUserReviewForProduct(productId, userId);
   }
 
   @Patch(':id')

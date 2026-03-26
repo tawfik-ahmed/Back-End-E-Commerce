@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { getMetadataArgsStorage, Like, Repository } from 'typeorm';
-import { User } from './entites/user.entity'; 
+import { User } from './entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -263,5 +263,15 @@ export class UserService {
    */
   public isExistsByEmail(email: string): Promise<boolean> {
     return this.userRepository.exists({ where: { email } });
+  }
+
+  /**
+   * Check if user with given id already exists.
+   *
+   * @param {number} id - Id to check.
+   * @returns {Promise<boolean>} - True if user exists, false otherwise.
+   */
+  public isUserExistsById(id: number): Promise<boolean> {
+    return this.userRepository.exists({ where: { id } });
   }
 }

@@ -25,6 +25,7 @@ import { ProductImage } from './product/entites/product-image.entity';
 import { SubCategory } from './sub-category/entites/sub-category.entity';
 import { ReviewModule } from './review/review.module';
 import { Review } from './review/entities/review.entity';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { Review } from './review/entities/review.entity';
           ProductImage,
           Review,
         ],
+        namingStrategy: new SnakeNamingStrategy(),
         synchronize: true,
       }),
     }),

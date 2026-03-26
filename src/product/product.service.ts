@@ -19,6 +19,9 @@ import { ProductColor } from './entites/product-color.entity';
 import { CategoryService } from '../category/category.service';
 import { SubCategoryService } from 'src/sub-category/sub-category.service';
 import { BrandService } from 'src/brand/brand.service';
+import { Category } from 'src/category/entites/category.entity';
+import { SubCategory } from 'src/sub-category/entites/sub-category.entity';
+import { Brand } from 'src/brand/entites/brand.entity';
 
 @Injectable()
 export class ProductService {
@@ -45,7 +48,9 @@ export class ProductService {
    * @param {CreateProductDto} createProductDto - Product data.
    * @returns {Promise<{ ok: boolean; data: Product; message: string }>} - Object with ok property, product data and success message.
    */
-  public async createProduct(createProductDto: CreateProductDto) {
+  public async createProduct(
+    createProductDto: CreateProductDto,
+  ): Promise<{ ok: boolean; data: Product; message: string }> {
     const {
       title,
       colors,
@@ -115,7 +120,9 @@ export class ProductService {
    *
    * @returns {Promise<{ ok: boolean, data: Product[] }>} - Object with ok property and array of product data.
    */
-  public async getAllProducts(query: any) {
+  public async getAllProducts(
+    query: any,
+  ): Promise<{ ok: boolean; data: Product[] }> {
     const {
       page,
       limit,
@@ -219,7 +226,15 @@ export class ProductService {
       order,
       skip,
       take,
-      relations: ['category', 'subCategory', 'brand', 'reviews', 'images', 'colors'],
+      relations: [
+        'category',
+        'subCategory',
+        'brand',
+        'reviews',
+        'reviews.user',
+        'images',
+        'colors',
+      ],
     });
     return { ok: true, data: products };
   }
@@ -230,7 +245,7 @@ export class ProductService {
    * @param {number} id - Product id.
    * @returns {Promise<{ ok: boolean, data: Product }>} - Object with ok property and product data.
    */
-  public async getProduct(id: number) {
+  public async getProduct(id: number): Promise<{ ok: boolean; data: Product }> {
     const product = await this.getProductById(id);
     return { ok: true, data: product };
   }
@@ -244,7 +259,10 @@ export class ProductService {
    * @param {UpdateProductDto} updateProductDto - Product data to update.
    * @returns {Promise<{ ok: boolean, data: Product, message: string }>} - Object with ok property, product data and success message.
    */
-  public async updateProduct(id: number, updateProductDto: UpdateProductDto) {
+  public async updateProduct(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<{ ok: boolean; data: Product; message: string }> {
     return await this.dataSource.transaction(async (manager: EntityManager) => {
       let product = await this.getProductById(id, manager);
 
@@ -316,10 +334,22 @@ export class ProductService {
    * @param {number} id - Product id.
    * @returns {Promise<{ ok: boolean; message: string }>} - Object with ok property and success message.
    */
-  public async deleteProduct(id: number) {
+  public async deleteProduct(
+    id: number,
+  ): Promise<{ ok: boolean; message: string }> {
     const product = await this.getProductById(id);
     await this.productRepository.remove(product);
     return { ok: true, message: 'Product deleted successfully' };
+  }
+
+  /**
+   * Checks if a product with the given id exists.
+   *
+   * @param {number} id - Product id.
+   * @returns {Promise<boolean>} - True if product exists, false otherwise.
+   */
+  public async isProductExistsById(id: number): Promise<boolean> {
+    return await this.productRepository.exists({ where: { id } });
   }
 
   /**
@@ -330,13 +360,23 @@ export class ProductService {
    * @param {number} id - Product id.
    * @returns {Promise<Product>} - Product object.
    */
-  private async getProductById(id: number, manager?: EntityManager) {
+  public async getProductById(
+    id: number,
+    manager?: EntityManager,
+  ): Promise<Product> {
     const repo = manager
       ? manager.getRepository(Product)
       : this.productRepository;
     const product = await repo.findOne({
       where: { id },
-      relations: ['category', 'subCategory', 'brand', 'reviews', 'images', 'colors'],
+      relations: [
+        'category',
+        'subCategory',
+        'brand',
+        'reviews',
+        'images',
+        'colors',
+      ],
     });
 
     if (!product) {
@@ -365,7 +405,7 @@ export class ProductService {
     subCategoryId: number,
     brandId: number,
     manager: EntityManager,
-  ) {
+  ): Promise<[Category, SubCategory, Brand]> {
     const [category, subCategory, brand] = await Promise.all([
       this.categoryService.getCategoryById(categoryId, manager),
       this.subCategoryService.getSubCategoryById(subCategoryId, manager),
@@ -402,11 +442,14 @@ export class ProductService {
    * @param {string[]} colors - Array of product color names.
    * @returns {Promise<void>} - Promise which resolves when the operation is completed.
    */
-  private async upsertColors(colors: string[], manager?: EntityManager) {
+  private async upsertColors(
+    colors: string[],
+    manager?: EntityManager,
+  ): Promise<void> {
     const repo = manager
       ? manager.getRepository(ProductColor)
       : this.productColorRepository;
-    return repo.upsert(
+    await repo.upsert(
       colors.map((color) => ({ name: color })),
       ['name'],
     );
@@ -418,7 +461,10 @@ export class ProductService {
    * @param {string[]} colors - Array of product color names.
    * @returns {Promise<ProductColor[]>} - Promise which resolves with an array of product color entities.
    */
-  private async getColorsEntites(colors: string[], manager?: EntityManager) {
+  private async getColorsEntites(
+    colors: string[],
+    manager?: EntityManager,
+  ): Promise<ProductColor[]> {
     const repo = manager
       ? manager.getRepository(ProductColor)
       : this.productColorRepository;
@@ -431,11 +477,14 @@ export class ProductService {
    * @param {string[]} images - Array of product image urls.
    * @returns {Promise<void>} - Promise which resolves when the operation is completed.
    */
-  private upsertImages(images: string[], manager?: EntityManager) {
+  private async upsertImages(
+    images: string[],
+    manager?: EntityManager,
+  ): Promise<void> {
     const repo = manager
       ? manager.getRepository(ProductImage)
       : this.productImageRepository;
-    return repo.upsert(
+    await repo.upsert(
       images.map((url) => ({ url })),
       ['url'],
     );
@@ -447,7 +496,10 @@ export class ProductService {
    * @param {string[]} images - Array of product image urls.
    * @returns {Promise<ProductImage[]>} - Promise which resolves with an array of product image entities.
    */
-  private getImagesEntites(images: string[], manager?: EntityManager) {
+  private getImagesEntites(
+    images: string[],
+    manager?: EntityManager,
+  ): Promise<ProductImage[]> {
     const repo = manager
       ? manager.getRepository(ProductImage)
       : this.productImageRepository;

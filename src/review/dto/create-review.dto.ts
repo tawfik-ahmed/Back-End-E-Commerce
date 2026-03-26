@@ -21,9 +21,6 @@ export class CreateReviewDto {
   @Max(5, { message: 'Rating must be at most 5 stars' })
   rating: number;
 
-  @IsNumber({}, { message: 'User ID must be a number' })
-  userId: number;
-
   @IsNumber({}, { message: 'Product ID must be a number' })
   productId: number;
 }
