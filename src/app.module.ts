@@ -23,6 +23,8 @@ import { Product } from './product/entites/product.entity';
 import { ProductColor } from './product/entites/product-color.entity';
 import { ProductImage } from './product/entites/product-image.entity';
 import { SubCategory } from './sub-category/entites/sub-category.entity';
+import { ReviewModule } from './review/review.module';
+import { Review } from './review/entities/review.entity';
 
 @Module({
   imports: [
@@ -59,6 +61,7 @@ import { SubCategory } from './sub-category/entites/sub-category.entity';
           Product,
           ProductColor,
           ProductImage,
+          Review,
         ],
         synchronize: true,
       }),
@@ -77,6 +80,7 @@ import { SubCategory } from './sub-category/entites/sub-category.entity';
     RequestProductModule,
     TaxModule,
     ProductModule,
+    ReviewModule,
   ],
   controllers: [],
   providers: [],

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { RequestProduct } from 'src/request-product/entites/request-product.entity';
 import { UserGender, UserRole } from '../../utils/enums';
+import { Review } from 'src/review/entities/review.entity';
 
 @Entity()
 export class User {
@@ -57,6 +58,9 @@ export class User {
 
   @OneToMany(() => RequestProduct, (requestProduct) => requestProduct.user)
   requestProducts: RequestProduct[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

@@ -16,6 +16,7 @@ import {
 } from 'typeorm';
 import { ProductColor } from './product-color.entity';
 import { ProductImage } from './product-image.entity';
+import { Review } from 'src/review/entities/review.entity';
 
 @Entity()
 export class Product {
@@ -64,6 +65,9 @@ export class Product {
 
   @ManyToOne(() => Brand, (brand) => brand.products)
   brand: Brand;
+
+  @OneToMany(() => Review, (review) => review.product)
+  reviews: Review[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

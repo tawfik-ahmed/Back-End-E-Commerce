@@ -130,17 +130,17 @@ export class ProductService {
       brandId,
     } = query;
 
+    const toNumber = (value: any): number | null => {
+      const num = Number(value);
+      return isNaN(num) ? null : num;
+    };
+
     const conditions: any = {};
 
     // keyword
     if (keyword) {
       conditions.title = Like(`%${keyword}%`);
     }
-
-    const toNumber = (value: any): number | null => {
-      const num = Number(value);
-      return isNaN(num) ? null : num;
-    };
 
     // price
     const priceGte = toNumber(price?.gte);
@@ -180,13 +180,19 @@ export class ProductService {
 
     // relations
     const category = toNumber(categoryId);
-    if (category !== null) conditions.category = { id: category };
+    if (category !== null) {
+      conditions.category = { id: category };
+    }
 
     const subCategory = toNumber(subCategoryId);
-    if (subCategory !== null) conditions.subCategory = { id: subCategory };
+    if (subCategory !== null) {
+      conditions.subCategory = { id: subCategory };
+    }
 
     const brand = toNumber(brandId);
-    if (brand !== null) conditions.brand = { id: brand };
+    if (brand !== null) {
+      conditions.brand = { id: brand };
+    }
 
     // sorting
     const validColumns = getMetadataArgsStorage()
@@ -213,9 +219,8 @@ export class ProductService {
       order,
       skip,
       take,
-      relations: ['category', 'subCategory', 'brand', 'images', 'colors'],
+      relations: ['category', 'subCategory', 'brand', 'reviews', 'images', 'colors'],
     });
-
     return { ok: true, data: products };
   }
 
@@ -331,7 +336,7 @@ export class ProductService {
       : this.productRepository;
     const product = await repo.findOne({
       where: { id },
-      relations: ['category', 'subCategory', 'brand', 'images', 'colors'],
+      relations: ['category', 'subCategory', 'brand', 'reviews', 'images', 'colors'],
     });
 
     if (!product) {
