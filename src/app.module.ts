@@ -65,6 +65,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
           Review,
         ],
         namingStrategy: new SnakeNamingStrategy(),
+        // dropSchema: true,
         synchronize: true,
       }),
     }),

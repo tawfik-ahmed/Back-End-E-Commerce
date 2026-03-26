@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -24,7 +25,7 @@ export class SubCategory {
   @ManyToOne(() => Category, (category) => category.subCategories)
   category: Category;
 
-  @ManyToOne(() => Product, (product) => product.subCategory)
+  @OneToMany(() => Product, (product) => product.subCategory)
   products: Product[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
