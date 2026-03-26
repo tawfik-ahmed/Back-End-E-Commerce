@@ -7,7 +7,7 @@ import { ProductModule } from 'src/product/product.module';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Review]), ProductModule, UserModule],
+  imports: [TypeOrmModule.forFeature([Review]), ProductModule],
   controllers: [ReviewController],
   providers: [ReviewService],
   exports: [],

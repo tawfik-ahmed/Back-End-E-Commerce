@@ -18,7 +18,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CurrentUser } from 'src/user/decorators/current-user.decorator';
 import type { JwtPayloadType } from 'src/utils/types';
 
-// ~api/v1/reviews
+// ~ api/v1/reviews
 @Controller('reviews')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
@@ -30,7 +30,7 @@ export class ReviewController {
     @Body() createReviewDto: CreateReviewDto,
     @CurrentUser() payload: JwtPayloadType,
   ) {
-    return this.reviewService.createReview(createReviewDto, payload.id);
+    return this.reviewService.createProductReview(createReviewDto, payload.id);
   }
 
   @Get(':productId')
@@ -48,16 +48,25 @@ export class ReviewController {
     return this.reviewService.getUserReviewForProduct(productId, userId);
   }
 
-  @Patch(':id')
+  @Patch(':productId')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
   public update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('productId', ParseIntPipe) productId: number,
+    @CurrentUser() payload: JwtPayloadType,
     @Body() updateReviewDto: UpdateReviewDto,
   ) {
-    return this.reviewService.updateReview(id, updateReviewDto);
+    return this.reviewService.updateProductReview(
+      productId,
+      payload.id,
+      updateReviewDto,
+    );
   }
 
-  @Delete(':id')
-  public delete(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewService.deleteReview(id);
+  @Delete(':productId')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public delete(@Param('productId', ParseIntPipe) productId: number, @CurrentUser() payload: JwtPayloadType) {
+    return this.reviewService.deleteProductReview(productId, payload);
   }
 }

@@ -390,6 +390,82 @@ export class ProductService {
   }
 
   /**
+   * Retrieves a product by id without relations.
+   *
+   * @throws {BadRequestException} If product does not exist.
+   *
+   * @param {number} id - Product id.
+   * @param {EntityManager} [manager] - EntityManager instance.
+   * @returns {Promise<Product>} - Product object.
+   */
+  public async getProductByIdWithoutRelations(
+    id: number,
+    manager?: EntityManager,
+  ) {
+    const repo = manager
+      ? manager.getRepository(Product)
+      : this.productRepository;
+
+    const product = await repo.findOne({ where: { id } });
+
+    if (!product) {
+      throw new BadRequestException({
+        ok: false,
+        message: 'Product not found',
+      });
+    }
+
+    return product;
+  }
+
+  /**
+   * Adjusts the average rating and ratings quantity of a product.
+   *
+   * @param {number} productId - Product id.
+   * @param {'add'|'update'|'delete'} type - Type of adjustment to make.
+   * @param {{ oldRating?: number; newRating?: number }} data - Data to adjust the ratings with.
+   * @param {EntityManager} [manager] - EntityManager instance.
+   * @returns {Promise<Product>} - Updated product object.
+   */
+  public async adjustProductRating(
+  productId: number,
+  type: 'add' | 'update' | 'delete',
+  data: { oldRating?: number; newRating?: number },
+  manager?: EntityManager,
+) {
+  const repo = manager ? manager.getRepository(Product) : this.productRepository;
+  const product = await this.getProductByIdWithoutRelations(productId, manager);
+
+  const oldCount = product.ratingsQuantity || 0;
+  const oldAvg = product.averageRating || 0;
+
+  let newCount = oldCount;
+  let newAvg = oldAvg;
+
+  switch (type) {
+    case 'add':
+      const ratingToAdd = data.newRating!;
+      newCount = oldCount + 1;
+      newAvg = (oldAvg * oldCount + ratingToAdd) / newCount;
+      break;
+
+    case 'update':
+      if (data.oldRating == null || data.newRating == null) break;
+      newAvg = (oldAvg * oldCount - data.oldRating + data.newRating) / oldCount;
+      break;
+
+    case 'delete':
+      const ratingToDelete = data.oldRating!;
+      newCount = Math.max(oldCount - 1, 0);
+      newAvg = newCount === 0 ? 0 : (oldAvg * oldCount - ratingToDelete) / newCount;
+      break;
+  }
+
+  product.ratingsQuantity = newCount;
+  product.averageRating = newAvg;
+  return repo.save(product);
+}
+  /**
    * Retrieves category, subcategory and brand entities by their ids.
    *
    * @throws {BadRequestException} If any of the entities does not exist.

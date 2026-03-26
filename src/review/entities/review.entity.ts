@@ -5,28 +5,34 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
-  Unique,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
-@Unique(['user', 'product'])
 export class Review {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  userId: number;
 
-  @Column({ nullable: true })
-  reviewText: string;
+  @PrimaryColumn()
+  productId: number;
 
-  @Column({type: 'int'})
+  @Column({ type: 'text', nullable: true })
+  comment?: string;
+
+  @Column({ type: 'int' })
   rating: number;
 
-  @ManyToOne(() => User, (user) => user.reviews, {onDelete: 'CASCADE'})
+  @ManyToOne(() => User, (user) => user.reviews, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.reviews, {onDelete: 'CASCADE'})
+  @ManyToOne(() => Product, (product) => product.reviews, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'product_id' })
   product: Product;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
