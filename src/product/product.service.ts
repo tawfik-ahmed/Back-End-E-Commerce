@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from './entites/product.entity';
+import { Product } from './entities/product.entity';
 import {
   Between,
   DataSource,
@@ -14,13 +14,13 @@ import {
   MoreThanOrEqual,
   Repository,
 } from 'typeorm';
-import { ProductImage } from './entites/product-image.entity';
-import { ProductColor } from './entites/product-color.entity';
+import { ProductImage } from './entities/product-image.entity';
+import { ProductColor } from './entities/product-color.entity';
 import { CategoryService } from '../category/category.service';
 import { SubCategoryService } from 'src/sub-category/sub-category.service';
 import { BrandService } from 'src/brand/brand.service';
-import { Category } from 'src/category/entites/category.entity';
-import { SubCategory } from 'src/sub-category/entites/sub-category.entity';
+import { Category } from 'src/category/entities/category.entity';
+import { SubCategory } from 'src/sub-category/entities/sub-category.entity';
 import { Brand } from 'src/brand/entites/brand.entity';
 
 @Injectable()
@@ -428,43 +428,50 @@ export class ProductService {
    * @returns {Promise<Product>} - Updated product object.
    */
   public async adjustProductRating(
-  productId: number,
-  type: 'add' | 'update' | 'delete',
-  data: { oldRating?: number; newRating?: number },
-  manager?: EntityManager,
-) {
-  const repo = manager ? manager.getRepository(Product) : this.productRepository;
-  const product = await this.getProductByIdWithoutRelations(productId, manager);
+    productId: number,
+    type: 'add' | 'update' | 'delete',
+    data: { oldRating?: number; newRating?: number },
+    manager?: EntityManager,
+  ) {
+    const repo = manager
+      ? manager.getRepository(Product)
+      : this.productRepository;
+    const product = await this.getProductByIdWithoutRelations(
+      productId,
+      manager,
+    );
 
-  const oldCount = product.ratingsQuantity || 0;
-  const oldAvg = product.averageRating || 0;
+    const oldCount = product.ratingsQuantity || 0;
+    const oldAvg = product.averageRating || 0;
 
-  let newCount = oldCount;
-  let newAvg = oldAvg;
+    let newCount = oldCount;
+    let newAvg = oldAvg;
 
-  switch (type) {
-    case 'add':
-      const ratingToAdd = data.newRating!;
-      newCount = oldCount + 1;
-      newAvg = (oldAvg * oldCount + ratingToAdd) / newCount;
-      break;
+    switch (type) {
+      case 'add':
+        const ratingToAdd = data.newRating!;
+        newCount = oldCount + 1;
+        newAvg = (oldAvg * oldCount + ratingToAdd) / newCount;
+        break;
 
-    case 'update':
-      if (data.oldRating == null || data.newRating == null) break;
-      newAvg = (oldAvg * oldCount - data.oldRating + data.newRating) / oldCount;
-      break;
+      case 'update':
+        if (data.oldRating == null || data.newRating == null) break;
+        newAvg =
+          (oldAvg * oldCount - data.oldRating + data.newRating) / oldCount;
+        break;
 
-    case 'delete':
-      const ratingToDelete = data.oldRating!;
-      newCount = Math.max(oldCount - 1, 0);
-      newAvg = newCount === 0 ? 0 : (oldAvg * oldCount - ratingToDelete) / newCount;
-      break;
+      case 'delete':
+        const ratingToDelete = data.oldRating!;
+        newCount = Math.max(oldCount - 1, 0);
+        newAvg =
+          newCount === 0 ? 0 : (oldAvg * oldCount - ratingToDelete) / newCount;
+        break;
+    }
+
+    product.ratingsQuantity = newCount;
+    product.averageRating = newAvg;
+    return repo.save(product);
   }
-
-  product.ratingsQuantity = newCount;
-  product.averageRating = newAvg;
-  return repo.save(product);
-}
   /**
    * Retrieves category, subcategory and brand entities by their ids.
    *

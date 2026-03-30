@@ -1,8 +1,10 @@
+import { Cart } from 'src/cart/entities/cart.entity';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -20,6 +22,9 @@ export class Coupon {
 
   @Column()
   discount: number;
+
+  @ManyToMany(() => Cart, (cart) => cart.coupons)
+  carts: Cart[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

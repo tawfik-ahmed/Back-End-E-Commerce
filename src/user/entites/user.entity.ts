@@ -5,12 +5,14 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { RequestProduct } from 'src/request-product/entites/request-product.entity';
+import { RequestProduct } from 'src/request-product/entities/request-product.entity';
 import { UserGender, UserRole } from '../../utils/enums';
 import { Review } from 'src/review/entities/review.entity';
+import { Cart } from 'src/cart/entities/cart.entity';
 
 @Entity()
 export class User {
@@ -61,6 +63,9 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
+
+  @OneToOne(() => Cart, (cart) => cart.user)
+  cart: Cart;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

@@ -1,5 +1,5 @@
-import { Category } from 'src/category/entites/category.entity';
-import { SubCategory } from 'src/sub-category/entites/sub-category.entity';
+import { Category } from 'src/category/entities/category.entity';
+import { SubCategory } from 'src/sub-category/entities/sub-category.entity';
 import { Brand } from 'src/brand/entites/brand.entity';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
@@ -16,6 +16,8 @@ import {
 import { ProductColor } from './product-color.entity';
 import { ProductImage } from './product-image.entity';
 import { Review } from 'src/review/entities/review.entity';
+import { Cart } from 'src/cart/entities/cart.entity';
+import { CartItem } from 'src/cart/entities/cart-item.entity';
 
 @Entity()
 export class Product {
@@ -67,6 +69,9 @@ export class Product {
 
   @OneToMany(() => Review, (review) => review.product)
   reviews: Review[];
+
+  @OneToMany(() => CartItem, (cartItem) => cartItem.product)
+  cartItems: CartItem[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

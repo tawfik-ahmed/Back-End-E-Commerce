@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTaxDto } from './dtos/create-tax.dto';
 import { Repository } from 'typeorm';
-import { Tax } from './entites/tax.entity';
+import { Tax } from './entities/tax.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()

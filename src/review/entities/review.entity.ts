@@ -1,4 +1,4 @@
-import { Product } from 'src/product/entites/product.entity';
+import { Product } from 'src/product/entities/product.entity';
 import { User } from 'src/user/entites/user.entity';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {

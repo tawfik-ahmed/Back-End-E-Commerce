@@ -1,18 +1,17 @@
+import { SubCategory } from 'src/sub-category/entities/sub-category.entity';
 import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Category } from 'src/category/entites/category.entity';
-import { Product } from 'src/product/entites/product.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Entity()
-export class SubCategory {
+export class Category {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,10 +21,10 @@ export class SubCategory {
   @Column({ nullable: true })
   image: string;
 
-  @ManyToOne(() => Category, (category) => category.subCategories)
-  category: Category;
+  @OneToMany(() => SubCategory, (subCategory) => subCategory.category)
+  subCategories: SubCategory[];
 
-  @OneToMany(() => Product, (product) => product.subCategory)
+  @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })

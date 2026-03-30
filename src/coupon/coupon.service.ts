@@ -6,7 +6,7 @@ import {
 import { CreateCouponDto } from './dtos/create-coupon.dto';
 import { UpdateCouponDto } from './dtos/update-coupon.dto';
 import { Repository } from 'typeorm';
-import { Coupon } from './entites/coupon.entity'; 
+import { Coupon } from './entities/coupon.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
