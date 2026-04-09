@@ -8,9 +8,9 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
-import { JwtPayloadType } from 'src/utils/types';
-import { UserRole } from 'src/utils/enums';
-import { ProductService } from 'src/product/product.service';
+import { JwtPayloadType } from '../utils/types'; 
+import { UserRole } from '../utils/enums'; 
+import { ProductService } from '../product/product.service';
 import { DataSource } from 'typeorm';
 
 @Injectable()

@@ -1,7 +1,7 @@
-import { Category } from 'src/category/entities/category.entity';
-import { SubCategory } from 'src/sub-category/entities/sub-category.entity';
-import { Brand } from 'src/brand/entites/brand.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { Category } from '../../category/entities/category.entity';
+import { SubCategory } from '../../sub-category/entities/sub-category.entity';
+import { Brand } from '../../brand/entites/brand.entity';
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
 import {
   Column,
   CreateDateColumn,
@@ -15,9 +15,8 @@ import {
 } from 'typeorm';
 import { ProductColor } from './product-color.entity';
 import { ProductImage } from './product-image.entity';
-import { Review } from 'src/review/entities/review.entity';
-import { Cart } from 'src/cart/entities/cart.entity';
-import { CartItem } from 'src/cart/entities/cart-item.entity';
+import { Review } from '../../review/entities/review.entity';
+import { CartItem } from '../../cart/entities/cart-item.entity';
 
 @Entity()
 export class Product {
@@ -42,7 +41,15 @@ export class Product {
   @Column({ default: 0, nullable: true })
   sold: number;
 
-  @Column({ default: 1, nullable: true })
+  @Column({
+    type: 'decimal',
+    precision: 20,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+  })
   price: number;
 
   @Column({ default: 1, nullable: true })

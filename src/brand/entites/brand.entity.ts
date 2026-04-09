@@ -1,5 +1,5 @@
-import { Product } from 'src/product/entities/product.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { Product } from '../../product/entities/product.entity'; 
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
 import {
   Column,
   CreateDateColumn,

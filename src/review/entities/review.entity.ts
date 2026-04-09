@@ -1,6 +1,6 @@
-import { Product } from 'src/product/entities/product.entity';
-import { User } from 'src/user/entites/user.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { Product } from '../../product/entities/product.entity'; 
+import { User } from '../../user/entites/user.entity'; 
+import { CURRENT_TIMESTAMP } from '../../utils/constants'; 
 import {
   Column,
   CreateDateColumn,

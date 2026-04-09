@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Cart } from './cart.entity';
-import { Product } from 'src/product/entities/product.entity';
+import { Product } from '../../product/entities/product.entity'; 
 
 @Entity()
 export class CartItem {
@@ -16,6 +16,15 @@ export class CartItem {
   @Column({ default: 1 })
   quantity: number;
 
-  @Column({ type: 'decimal', scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 20,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+    default: 0
+  })
   price: number;
 }

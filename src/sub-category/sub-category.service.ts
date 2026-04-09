@@ -8,7 +8,7 @@ import { UpdateSubCategoryDto } from './dtos/update-sub-category.dto';
 import { EntityManager, Repository } from 'typeorm';
 import { SubCategory } from './entities/sub-category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoryService } from 'src/category/category.service';
+import { CategoryService } from '../category/category.service'; 
 
 @Injectable()
 export class SubCategoryService {

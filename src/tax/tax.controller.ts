@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Delete, UseGuards } from '@nestjs/common';
 import { TaxService } from './tax.service';
 import { CreateTaxDto } from './dtos/create-tax.dto';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { UserRole } from '../utils/enums';
+import { AuthGuard } from '../auth/guards/auth.guard'; 
 
 // ~ api/v1/taxes
 @Controller('taxes')

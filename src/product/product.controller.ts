@@ -13,9 +13,9 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { UserRole } from '../utils/enums'; 
+import { AuthGuard } from '../auth/guards/auth.guard'; 
 
 // ~api/v1/products
 @Controller('products')

@@ -13,9 +13,9 @@ import {
 import { CouponService } from './coupon.service';
 import { CreateCouponDto } from './dtos/create-coupon.dto';
 import { UpdateCouponDto } from './dtos/update-coupon.dto';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { UserRole } from 'src/utils/enums';
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { AuthGuard } from '../auth/guards/auth.guard'; 
+import { UserRole } from '../utils/enums'; 
 
 // ~api/v1/coupons
 @Controller('coupons')

@@ -1,5 +1,3 @@
-import { User } from 'src/user/entites/user.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
 import {
   Column,
   CreateDateColumn,
@@ -8,6 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from '../../user/entites/user.entity';
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
 
 @Entity()
 export class RequestProduct {

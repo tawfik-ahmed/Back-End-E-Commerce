@@ -5,14 +5,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { getMetadataArgsStorage, Like, Repository } from 'typeorm';
+import { EntityManager, getMetadataArgsStorage, Like, Repository } from 'typeorm';
 import { User } from './entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UserRole } from 'src/utils/enums';
-import { JwtPayloadType } from 'src/utils/types';
-import { AuthService } from 'src/auth/auth.service';
+import { UserRole } from '../utils/enums'; 
+import { JwtPayloadType } from '../utils/types'; 
+import { AuthService } from '../auth/auth.service'; 
 
 @Injectable()
 export class UserService {
@@ -225,8 +225,9 @@ export class UserService {
    * @param {number} id - User id.
    * @returns {Promise<User>} - User object.
    */
-  public async getUserById(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  public async getUserById(id: number, manager?: EntityManager): Promise<User> {
+    const repo = manager ? manager.getRepository(User) : this.userRepository;
+    const user = await repo.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException({ ok: false, message: 'User not found' });

@@ -10,12 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RequestProductService } from './request-product.service';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { UserRole } from '../utils/enums'; 
+import { AuthGuard } from '../auth/guards/auth.guard'; 
 import { CreateRequestProductDto } from './dtos/create-request-product.dto';
-import { CurrentUser } from 'src/user/decorators/current-user.decorator';
-import type { JwtPayloadType } from 'src/utils/types';
+import { CurrentUser } from '../user/decorators/current-user.decorator'; 
+import type { JwtPayloadType } from '../utils/types'; 
 import { UpdateRequestProductDto } from './dtos/update-request-product.dto';
 
 // ~api/v1/request-products

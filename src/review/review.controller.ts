@@ -12,11 +12,11 @@ import {
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { CurrentUser } from 'src/user/decorators/current-user.decorator';
-import type { JwtPayloadType } from 'src/utils/types';
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { UserRole } from '../utils/enums';
+import { AuthGuard } from '../auth/guards/auth.guard'; 
+import { CurrentUser } from '../user/decorators/current-user.decorator'; 
+import type { JwtPayloadType } from '../utils/types';
 
 // ~ api/v1/reviews
 @Controller('reviews')

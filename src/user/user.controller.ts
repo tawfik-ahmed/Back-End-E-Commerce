@@ -14,12 +14,12 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AuthGuard } from '../auth/guards/auth.guard'; 
 import { Roles } from './decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
+import { UserRole } from '../utils/enums'; 
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
-import type { JwtPayloadType } from 'src/utils/types';
+import type { JwtPayloadType } from '../utils/types'; 
 
 // ~ api/v1/users
 @UseInterceptors(ClassSerializerInterceptor)

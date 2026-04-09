@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { ProductColor } from './entities/product-color.entity';
 import { ProductImage } from './entities/product-image.entity';
-import { CategoryModule } from 'src/category/category.module';
-import { SubCategoryModule } from 'src/sub-category/sub-category.module';
-import { BrandModule } from 'src/brand/brand.module';
+import { CategoryModule } from '../category/category.module'; 
+import { SubCategoryModule } from '../sub-category/sub-category.module';
+import { BrandModule } from '../brand/brand.module'; 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Product, ProductColor, ProductImage]),

@@ -9,7 +9,7 @@ import { RequestProduct } from './entities/request-product.entity';
 import { Repository } from 'typeorm';
 import { CreateRequestProductDto } from './dtos/create-request-product.dto';
 import { UserService } from '../user/user.service';
-import { JwtPayloadType } from 'src/utils/types';
+import { JwtPayloadType } from '../utils/types'; 
 import { UpdateRequestProductDto } from './dtos/update-request-product.dto';
 
 @Injectable()

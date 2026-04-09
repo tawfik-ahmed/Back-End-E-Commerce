@@ -17,11 +17,11 @@ import {
 import { ProductImage } from './entities/product-image.entity';
 import { ProductColor } from './entities/product-color.entity';
 import { CategoryService } from '../category/category.service';
-import { SubCategoryService } from 'src/sub-category/sub-category.service';
-import { BrandService } from 'src/brand/brand.service';
-import { Category } from 'src/category/entities/category.entity';
-import { SubCategory } from 'src/sub-category/entities/sub-category.entity';
-import { Brand } from 'src/brand/entites/brand.entity';
+import { SubCategoryService } from '../sub-category/sub-category.service'; 
+import { BrandService } from '../brand/brand.service'; 
+import { Category } from '../category/entities/category.entity'; 
+import { SubCategory } from '../sub-category/entities/sub-category.entity'; 
+import { Brand } from '../brand/entites/brand.entity'; 
 
 @Injectable()
 export class ProductService {

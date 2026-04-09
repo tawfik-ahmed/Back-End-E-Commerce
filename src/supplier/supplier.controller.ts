@@ -12,9 +12,9 @@ import {
 import { SupplierService } from './supplier.service';
 import { CreateSupplierDto } from './dtos/create-supplier.dto';
 import { UpdateSupplierDto } from './dtos/update-supplier.dto';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from '../user/decorators/roles.decorator';
+import { UserRole } from '../utils/enums';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 // ~api/v1/suppliers
 @Controller('suppliers')

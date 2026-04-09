@@ -1,6 +1,6 @@
-import { Coupon } from 'src/coupon/entities/coupon.entity';
-import { User } from 'src/user/entites/user.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { Coupon } from '../../coupon/entities/coupon.entity';
+import { User } from '../../user/entites/user.entity';
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
 import {
   Column,
   CreateDateColumn,
@@ -20,10 +20,28 @@ export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'decimal', scale: 2, default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 20,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+    default: 0,
+  })
   totalPrice: number;
 
-  @Column({ type: 'decimal', scale: 2, default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 20,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+    default: 0,
+  })
   totalPriceAfterDiscount: number;
 
   @OneToOne(() => User, (user) => user.cart)

@@ -12,9 +12,9 @@ import {
 import { SubCategoryService } from './sub-category.service';
 import { CreateSubCategoryDto } from './dtos/create-sub-category.dto';
 import { UpdateSubCategoryDto } from './dtos/update-sub-category.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { UserRole } from '../utils/enums';
 
 // ~ api/v1/sub-categories
 @Controller('sub-categories')

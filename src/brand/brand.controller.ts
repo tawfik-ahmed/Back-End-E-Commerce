@@ -12,9 +12,9 @@ import {
 import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dtos/create-brand.dto';
 import { UpdateBrandDto } from './dtos/update-brand.dto';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { UserRole } from '../utils/enums'; 
+import { AuthGuard } from '../auth/guards/auth.guard'; 
 
 // ~ api/v1/brands
 @Controller('brands')

@@ -1,4 +1,4 @@
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { CURRENT_TIMESTAMP } from '../../utils/constants'; 
 import {
   Column,
   CreateDateColumn,
@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Category } from 'src/category/entities/category.entity';
-import { Product } from 'src/product/entities/product.entity';
+import { Category } from '../../category/entities/category.entity';
+import { Product } from '../../product/entities/product.entity'; 
 
 @Entity()
 export class SubCategory {

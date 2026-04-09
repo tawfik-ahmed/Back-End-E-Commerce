@@ -12,11 +12,11 @@ import {
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dtos/create-cart.dto';
 import { UpdateCartDto } from './dtos/update-cart.dto';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { CurrentUser } from 'src/user/decorators/current-user.decorator';
-import type { JwtPayloadType } from 'src/utils/types';
+import { Roles } from '../user/decorators/roles.decorator';
+import { UserRole } from '../utils/enums';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { CurrentUser } from '../user/decorators/current-user.decorator';
+import type { JwtPayloadType } from '../utils/types';
 
 // ~ api/v1/carts
 @Controller('carts')
@@ -31,6 +31,35 @@ export class CartController {
     @Param('productId', ParseIntPipe) productId: number,
     @CurrentUser() payload: JwtPayloadType,
   ) {
-    return this.cartService.createCartItem(createCartDto, productId, payload.id);
+    return this.cartService.createCartItem(
+      createCartDto,
+      productId,
+      payload.id,
+    );
+  }
+
+  @Patch('items/:itemId')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public update(
+    @Param('itemId', ParseIntPipe) itemId: number,
+    @Body() updateCartDto: UpdateCartDto,
+    @CurrentUser() payload: JwtPayloadType,
+  ) {
+    return this.cartService.updateCartItem(itemId, payload, updateCartDto);
+  }
+
+  @Delete('items/:itemId')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public delete(@Param('itemId', ParseIntPipe) itemId: number, @CurrentUser() payload: JwtPayloadType) {
+    return this.cartService.deleteCartItem(itemId, payload);
+  }
+
+  @Get('me')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public getMyCart(@CurrentUser() payload: JwtPayloadType) {
+    return this.cartService.getCart(payload.id);
   }
 }

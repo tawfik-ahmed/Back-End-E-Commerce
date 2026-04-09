@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { CURRENT_TIMESTAMP } from '../../utils/constants'; 
 import {
   Column,
   CreateDateColumn,
@@ -9,10 +9,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { RequestProduct } from 'src/request-product/entities/request-product.entity';
+import { RequestProduct } from '../../request-product/entities/request-product.entity'; 
 import { UserGender, UserRole } from '../../utils/enums';
-import { Review } from 'src/review/entities/review.entity';
-import { Cart } from 'src/cart/entities/cart.entity';
+import { Review } from '../../review/entities/review.entity'; 
+import { Cart } from '../../cart/entities/cart.entity'; 
 
 @Entity()
 export class User {

@@ -1,5 +1,5 @@
-import { Cart } from 'src/cart/entities/cart.entity';
-import { CURRENT_TIMESTAMP } from 'src/utils/constants';
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
+import { Cart } from '../../cart/entities/cart.entity'; 
 import {
   Column,
   CreateDateColumn,

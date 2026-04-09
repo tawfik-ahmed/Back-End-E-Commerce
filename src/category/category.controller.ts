@@ -12,9 +12,9 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dtos/create-category.dto';
 import { UpdateCategoryDto } from './dtos/update-category.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/utils/enums';
+import { AuthGuard } from '../auth/guards/auth.guard'; 
+import { Roles } from '../user/decorators/roles.decorator'; 
+import { UserRole } from '../utils/enums';
 
 // ~ api/v1/categories
 @Controller('categories')
