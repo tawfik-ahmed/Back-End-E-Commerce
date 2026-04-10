@@ -17,11 +17,11 @@ import {
 import { ProductImage } from './entities/product-image.entity';
 import { ProductColor } from './entities/product-color.entity';
 import { CategoryService } from '../category/category.service';
-import { SubCategoryService } from '../sub-category/sub-category.service'; 
-import { BrandService } from '../brand/brand.service'; 
-import { Category } from '../category/entities/category.entity'; 
-import { SubCategory } from '../sub-category/entities/sub-category.entity'; 
-import { Brand } from '../brand/entites/brand.entity'; 
+import { SubCategoryService } from '../sub-category/sub-category.service';
+import { BrandService } from '../brand/brand.service';
+import { Category } from '../category/entities/category.entity';
+import { SubCategory } from '../sub-category/entities/sub-category.entity';
+import { Brand } from '../brand/entites/brand.entity';
 
 @Injectable()
 export class ProductService {
@@ -72,6 +72,16 @@ export class ProductService {
         throw new BadRequestException({
           ok: false,
           message: 'Product already exists',
+        });
+      }
+
+      if (
+        createProductDto.discount &&
+        createProductDto.discount > createProductDto.price
+      ) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Discount must be less than price',
         });
       }
 
@@ -277,6 +287,28 @@ export class ProductService {
       } = updateProductDto;
 
       const productRepository = manager.getRepository(Product);
+      let throwDiscountError = false;
+
+      if (updateProductDto.discount) {
+        if (updateProductDto.price) {
+          if (updateProductDto.discount > updateProductDto.price) {
+            throwDiscountError = true;
+          }
+        } else if (updateProductDto.discount > product.price) {
+          throwDiscountError = true;
+        }
+      }
+
+      if (updateProductDto.price && product.discount > updateProductDto.price) {
+        throwDiscountError = true;
+      }
+
+      if (throwDiscountError) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Discount cannot be greater than price',
+        });
+      }
 
       if (title && title !== product.title) {
         const isExists = await productRepository.exists({

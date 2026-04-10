@@ -42,7 +42,7 @@ export class CreateProductDto {
 
   @IsNumber({}, { message: 'price after discount must be a number' })
   @Min(1, { message: 'price must be at least 1' })
-  priceAfterDiscount: number;
+  discount: number;
 
   @IsArray({ message: 'colors must be an array' })
   @IsString({ each: true, message: 'each color must be a string' })

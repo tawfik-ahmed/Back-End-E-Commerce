@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateCouponDto } from './dtos/create-coupon.dto';
 import { UpdateCouponDto } from './dtos/update-coupon.dto';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Coupon } from './entities/coupon.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -99,10 +99,32 @@ export class CouponService {
    * @throws {NotFoundException} If coupon does not exist.
    *
    * @param {number} id - Coupon id.
+   * @param {EntityManager} [manager] - EntityManager instance.
    * @returns {Promise<Coupon>} - Coupon object.
    */
-  private async getOneCouponById(id: number) {
-    const coupon = await this.couponRepository.findOne({ where: { id } });
+  public async getOneCouponById(id: number, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Coupon) : this.couponRepository;
+    const coupon = await repo.findOne({ where: { id } });
+
+    if (!coupon) {
+      throw new NotFoundException({ ok: false, message: 'Coupon not found' });
+    }
+
+    return coupon;
+  }
+
+  /**
+   * Retrieves a coupon by its name.
+   *
+   * @throws {NotFoundException} If coupon does not exist.
+   *
+   * @param {string} name - Coupon name.
+   * @param {EntityManager} [manager] - EntityManager instance.
+   * @returns {Promise<Coupon>} - Coupon object.
+   */
+  public async getOneCouponByName(name: string, manager?: EntityManager) {
+    const repo = manager ? manager.getRepository(Coupon) : this.couponRepository;
+    const coupon = await repo.findOne({ where: { name } });
 
     if (!coupon) {
       throw new NotFoundException({ ok: false, message: 'Coupon not found' });

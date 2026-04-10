@@ -52,8 +52,8 @@ export class Product {
   })
   price: number;
 
-  @Column({ default: 1, nullable: true })
-  priceAfterDiscount: number;
+  @Column({ default: 0, nullable: true })
+  discount: number;
 
   @ManyToMany(() => ProductColor, (color) => color.products)
   @JoinTable()

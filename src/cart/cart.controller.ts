@@ -62,4 +62,18 @@ export class CartController {
   public getMyCart(@CurrentUser() payload: JwtPayloadType) {
     return this.cartService.getCart(payload.id);
   }
+  
+  @Get('admin/:userId')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public getCartByAdmin(@Param('userId', ParseIntPipe) userId: number) {
+    return this.cartService.getCart(userId);
+  }
+
+  @Post('coupons/:couponName')
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public ApplyCoupons(@Param('couponName') couponName: string, @CurrentUser() payload: JwtPayloadType) {
+    return this.cartService.ApplyCoupons(couponName, payload);
+  }
 }

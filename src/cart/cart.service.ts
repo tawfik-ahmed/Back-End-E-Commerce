@@ -3,7 +3,6 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateCartDto } from './dtos/create-cart.dto';
 import { UpdateCartDto } from './dtos/update-cart.dto';
@@ -16,6 +15,8 @@ import { ProductService } from '../product/product.service';
 import { Product } from '../product/entities/product.entity';
 import { JwtPayloadType } from '../utils/types';
 import { UserRole } from '../utils/enums';
+import { CouponService } from '../coupon/coupon.service';
+import { Coupon } from '../coupon/entities/coupon.entity';
 
 @Injectable()
 export class CartService {
@@ -26,6 +27,7 @@ export class CartService {
 
     private readonly userService: UserService,
     private readonly productService: ProductService,
+    private readonly couponService: CouponService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -60,6 +62,7 @@ export class CartService {
         });
       }
 
+      const productPrice = this.getPriceAfterDiscount(product);
       let cart = await this.getCartByUserId(userId, manager);
       let cartItem;
 
@@ -70,30 +73,34 @@ export class CartService {
           cart,
           product,
           quantity,
-          price: product.price * quantity,
+          price: productPrice * quantity,
         });
         cart.totalPrice = Number(product.price) * quantity;
-        cart.totalPriceAfterDiscount = cart.totalPrice;
+        cart.totalPriceAfterDiscount = productPrice * quantity;
         await cartItemRepo.save(cartItem);
         await cartRepo.save(cart);
       } else {
         cartItem = await this.getCartItem(cart.id, product.id, manager);
         if (cartItem) {
           cart.totalPrice -= Number(product.price) * cartItem.quantity;
+          cart.totalPriceAfterDiscount -= cartItem.price;
+
           cartItem.quantity = quantity;
-          cartItem.price = product.price * quantity;
+          cartItem.price = productPrice * quantity;
+
           cart.totalPrice += Number(product.price) * quantity;
+          cart.totalPriceAfterDiscount += productPrice * quantity;
         } else {
           cartItem = cartItemRepo.create({
             cart,
             product,
             quantity,
-            price: product.price * quantity,
+            price: productPrice * quantity,
           });
           cart.totalPrice += Number(product.price) * quantity;
+          cart.totalPriceAfterDiscount += productPrice * quantity;
         }
-        // update it later when add discount
-        cart.totalPriceAfterDiscount = cart.totalPrice;
+
         await cartRepo.save(cart);
         await cartItemRepo.save(cartItem);
         cartItem = await this.getCartItemById(cartItem.id, manager);
@@ -149,11 +156,17 @@ export class CartService {
         throw new ForbiddenException('You are not allowed to update this cart');
       }
 
-      cart.totalPrice -= Number(cartItem.price);
+      const product = cartItem.product;
+      const productPrice = this.getPriceAfterDiscount(product);
+
+      cart.totalPrice -= Number(product.price) * cartItem.quantity;
+      cart.totalPriceAfterDiscount -= cartItem.price;
+
       cartItem.quantity = quantity;
-      cartItem.price = cartItem.product.price * quantity;
-      cart.totalPrice += Number(cartItem.price);
-      cart.totalPriceAfterDiscount = cart.totalPrice;
+      cartItem.price = productPrice * quantity;
+
+      cart.totalPrice += Number(product.price) * quantity;
+      cart.totalPriceAfterDiscount += productPrice * quantity;
 
       await cartItemRepo.save(cartItem);
       await cartRepo.save(cart);
@@ -179,7 +192,7 @@ export class CartService {
 
       const cartItem = await cartItemRepo.findOne({
         where: { id: itemId },
-        relations: ['cart', 'cart.user'],
+        relations: ['cart', 'cart.user', 'product'],
       });
 
       if (!cartItem) {
@@ -199,8 +212,10 @@ export class CartService {
         throw new ForbiddenException('You are not allowed to delete this cart');
       }
 
-      cart.totalPrice -= Number(cartItem.price) * cartItem.quantity;
-      cart.totalPriceAfterDiscount = cart.totalPrice;
+      const product = cartItem.product;
+
+      cart.totalPrice -= Number(product.price) * cartItem.quantity;
+      cart.totalPriceAfterDiscount -= cartItem.price;
 
       await cartItemRepo.delete(itemId);
       await cartRepo.save(cart);
@@ -220,6 +235,74 @@ export class CartService {
     return { ok: true, data: cart };
   }
 
+  /**
+   * Applies a coupon to the user's cart.
+   *
+   * @param {string} couponName - Name of the coupon to apply.
+   * @param {JwtPayloadType} payload - User payload containing user id.
+   * @returns {Promise<{ ok: boolean, data: Cart, message: string }>} - Object with ok property, cart data and success message.
+   * @throws {BadRequestException} If coupon is expired, cart not found, or coupon already applied.
+   */
+  public async ApplyCoupons(couponName: string, payload: JwtPayloadType) {
+    const { id: userId } = payload;
+
+    return this.dataSource.transaction(async (manager: EntityManager) => {
+      const cartRepo = manager.getRepository(Cart);
+
+      const coupon = await this.couponService.getOneCouponByName(
+        couponName,
+        manager,
+      );
+
+      if (coupon.expireDate && coupon.expireDate < new Date()) {
+        throw new BadRequestException('Coupon is expired');
+      }
+
+      const userCart = await this.getCartByUserId(userId, manager);
+
+      if (!userCart) {
+        throw new BadRequestException('Cart not found');
+      }
+
+      userCart.coupons = userCart.coupons || [];
+
+      const isAlreadyApplied = userCart.coupons.some(
+        (c) => c.name === coupon.name,
+      );
+
+      if (isAlreadyApplied) {
+        throw new BadRequestException('Coupon already applied');
+      }
+
+      userCart.coupons.push(coupon);
+
+      const couponDiscount = userCart.coupons.reduce(
+        (sum, c) => sum + (Number(c.discount) || 0),
+        0,
+      );
+      userCart.totalPriceAfterDiscount = Math.max(
+        0,
+        userCart.totalPrice - couponDiscount,
+      );
+
+      await cartRepo.save(userCart);
+      return {
+        ok: true,
+        data: userCart,
+        message: 'Coupon applied successfully',
+      };
+    });
+  }
+
+  /**
+   * Retrieves a cart item by cart id and product id.
+   *
+   * @param {number} cartId - Cart id.
+   * @param {number} productId - Product id.
+   * @param {EntityManager} [manager] - EntityManager instance.
+   * @returns {Promise<CartItem>} - Cart item object.
+   * @throws {NotFoundException} If cart item is not found.
+   */
   public async getCartItem(
     cartId: number,
     productId: number,
@@ -240,13 +323,12 @@ export class CartService {
    * @param {number} userId - User id.
    * @param {EntityManager} [manager] - EntityManager instance.
    * @returns {Promise<Cart>} - Cart object.
-   * @throws {NotFoundException} If cart is not found.
    */
   public async getCartByUserId(userId: number, manager?: EntityManager) {
     const repo = manager ? manager.getRepository(Cart) : this.cartRepository;
     const cart = await repo.findOne({
       where: { user: { id: userId } },
-      relations: ['items', 'items.product'],
+      relations: ['items', 'items.product', 'coupons'],
     });
 
     return cart;
@@ -291,5 +373,17 @@ export class CartService {
     }
 
     return cart;
+  }
+
+  /**
+   * Returns the price of a product after discount has been applied.
+   *
+   * @param {Product} product - Product object.
+   * @returns {number} - Price of the product after discount.
+   */
+  public getPriceAfterDiscount(product: Product) {
+    const price = Number(product.price);
+    const discount = product.discount || 0;
+    return Math.max(0, price - discount);
   }
 }
