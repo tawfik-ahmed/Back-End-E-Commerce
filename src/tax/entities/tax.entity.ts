@@ -12,10 +12,10 @@ export class Tax {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'decimal', precision: 20, scale: 2 })
   taxPrice: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'decimal', precision: 20, scale: 2 })
   shippingPrice: number;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })

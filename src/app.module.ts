@@ -29,6 +29,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { CartModule } from './cart/cart.module';
 import { Cart } from './cart/entities/cart.entity';
 import { CartItem } from './cart/entities/cart-item.entity';
+import { OrderModule } from './order/order.module';
+import { Order } from './order/entities/order.entity';
 
 @Module({
   imports: [
@@ -68,6 +70,7 @@ import { CartItem } from './cart/entities/cart-item.entity';
           Review,
           Cart,
           CartItem,
+          Order
         ],
         namingStrategy: new SnakeNamingStrategy(),
         // dropSchema: true,
@@ -90,6 +93,7 @@ import { CartItem } from './cart/entities/cart-item.entity';
     ProductModule,
     ReviewModule,
     CartModule,
+    OrderModule,
   ],
   controllers: [],
   providers: [],

@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Cart } from './cart.entity';
 import { Product } from '../../product/entities/product.entity'; 
+import { Order } from '../../order/entities/order.entity';
 
 @Entity()
 export class CartItem {
@@ -12,6 +13,9 @@ export class CartItem {
 
   @ManyToOne(() => Product, (product) => product.cartItems)
   product: Product;
+
+  @ManyToOne(() => Order, (order) => order.cartItems)
+  order: Order
 
   @Column({ default: 1 })
   quantity: number;
