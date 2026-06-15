@@ -8,6 +8,6 @@ import { Tax } from './entities/tax.entity';
   imports: [TypeOrmModule.forFeature([Tax])],
   controllers: [TaxController],
   providers: [TaxService],
-  exports: [],
+  exports: [TaxService],
 })
 export class TaxModule {}

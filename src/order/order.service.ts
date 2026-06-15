@@ -1,11 +1,193 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
+import { paymentMethod } from '../utils/enums';
+import { JwtPayloadType, paymentMethods } from '../utils/types';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Order } from './entities/order.entity';
+import { EntityManager, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
+import { CartService } from '../cart/cart.service';
+import { TaxService } from '../tax/tax.service';
+import { UserService } from '../user/user.service';
+import Stripe from 'stripe';
+import { ConfigService } from '@nestjs/config';
+import { CartItem } from '../cart/entities/cart-item.entity';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class OrderService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+  private readonly stripe;
+
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+
+    private readonly cartService: CartService,
+    private readonly taxService: TaxService,
+    private readonly userService: UserService,
+    private readonly dataSource: DataSource,
+    private readonly configService: ConfigService,
+    private readonly productService: ProductService,
+  ) {
+    this.stripe = new Stripe(
+      this.configService.get<string>('STRIPE_SECRET_KEY')!,
+    );
+  }
+
+  public createOrder(
+    createOrderDto: CreateOrderDto,
+    paymentMethodType: string,
+    payload: JwtPayloadType,
+    linksAfterPayment: any,
+  ) {
+    const { id: userId } = payload;
+
+    if (!paymentMethods.includes(paymentMethodType)) {
+      throw new NotFoundException({
+        ok: false,
+        message: 'Payment Method not found',
+      });
+    }
+
+    return this.dataSource.transaction(async (manager: EntityManager) => {
+      const cart = await this.cartService.getCartByUserId(userId, manager);
+
+      if (!cart) {
+        throw new NotFoundException({
+          ok: false,
+          message: 'Cart not found',
+        });
+      }
+
+      if (!cart.items.length) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Cart items is empty',
+        });
+      }
+
+      const taxes = await this.taxService.getTaxes(manager);
+      const user = await this.userService.getUserById(userId, manager);
+
+      let taxPrice = taxes.reduce((acc, tax) => acc + Number(tax.taxPrice), 0);
+      let shippingPrice = taxes.reduce(
+        (acc, tax) => acc + Number(tax.shippingPrice),
+        0,
+      );
+
+      let shippingAddress: any = user.address;
+
+      if (createOrderDto?.phone) {
+        shippingAddress = { ...createOrderDto };
+      }
+
+      if (!shippingAddress) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Shipping address is required',
+        });
+      }
+
+      let orderData = {
+        user,
+        cartItems: cart?.items || [],
+        taxPrice,
+        shippingPrice,
+        orderPrice: cart.totalPriceAfterDiscount + taxPrice + shippingPrice,
+        paymentMethod: paymentMethodType as paymentMethod,
+        shippingAddress,
+        isPaid: false,
+        isDelivered: false,
+        deliveredAt: null as Date | null,
+      };
+
+      const orderRepo = manager.getRepository(Order);
+
+      if (paymentMethodType === paymentMethod.CASH) {
+        const order = orderRepo.create(orderData);
+
+        if (orderData.orderPrice === 0) {
+          order.isPaid = true;
+          order.isDelivered = true;
+          order.deliveredAt = new Date();
+          await this.productService.processSale(orderData.cartItems, manager);
+        }
+
+        await orderRepo.save(order);
+        await this.cartService.resetCart(userId, manager);
+
+        return {
+          ok: true,
+          message: 'Order created successfully',
+          order,
+        };
+      } else if (paymentMethodType === paymentMethod.CARD) {
+        const { success_url, cancel_url } = linksAfterPayment;
+
+        const order = orderRepo.create(orderData);
+        await orderRepo.save(order);
+
+        const session = await this.stripe.checkout.sessions.create({
+          line_items: orderData.cartItems.map((item: CartItem) => {
+            const pricePerUnit =
+              item.product.price - (item.product.discount || 0);
+
+            return {
+              price_data: {
+                currency: 'egp',
+                unit_amount: Math.round(pricePerUnit * 100),
+                tax_behavior: 'exclusive',
+                product_data: {
+                  name: item.product.title,
+                  description: `Order #${order.id}`,
+                  images: [
+                    item.product.imageCover,
+                    ...item.product.images.map((img) => img.url),
+                  ],
+                  metadata: {
+                    orderId: String(order.id),
+                    productId: String(item.product.id),
+                    shippingAddress: JSON.stringify(shippingAddress),
+                  },
+                },
+              },
+              quantity: item.quantity,
+            };
+          }),
+
+          mode: 'payment',
+
+          client_reference_id: String(userId),
+          customer_email: user.email,
+
+          success_url,
+          cancel_url,
+        });
+
+        order.sessionId = session.id;
+
+        await orderRepo.save(order);
+        await this.cartService.resetCart(userId, manager);
+
+        return {
+          ok: true,
+          message: 'Order created successfully',
+          data: {
+            totalPrice: session.amount_total / 100,
+            expiresAt: new Date(session.expires_at * 1000),
+            url: session.url,
+            success_url: `${session.success_url}?session_id=${session.id}`,
+            cancel_url: session.cancel_url,
+            orderData: order,
+          },
+        };
+      }
+    });
   }
 
   findAll() {

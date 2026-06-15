@@ -22,6 +22,7 @@ import { BrandService } from '../brand/brand.service';
 import { Category } from '../category/entities/category.entity';
 import { SubCategory } from '../sub-category/entities/sub-category.entity';
 import { Brand } from '../brand/entites/brand.entity';
+import { CartItem } from '../cart/entities/cart-item.entity';
 
 @Injectable()
 export class ProductService {
@@ -504,6 +505,21 @@ export class ProductService {
     product.averageRating = newAvg;
     return repo.save(product);
   }
+
+  public async processSale(cartItems: CartItem[], manager?: EntityManager) {
+  
+    const repo = manager
+      ? manager.getRepository(Product)
+      : this.productRepository;
+
+    for (const item of cartItems) {
+      await repo.update(item.product.id, {
+        sold: item.product.sold + item.quantity,
+        quantity: item.product.quantity - item.quantity,
+      });
+    }
+  }
+
   /**
    * Retrieves category, subcategory and brand entities by their ids.
    *

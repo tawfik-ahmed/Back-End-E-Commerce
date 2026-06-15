@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTaxDto } from './dtos/create-tax.dto';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Tax } from './entities/tax.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -49,8 +49,19 @@ export class TaxService {
    * @returns {Promise<{ ok: boolean; data: Tax[] }>} - Object with ok property and array of tax data.
    */
   public async getAllTaxes(): Promise<{ ok: boolean; data: Tax[] }> {
-    const taxes = await this.taxRepository.find();
+    const taxes = await this.getTaxes();
     return { ok: true, data: taxes };
+  }
+
+  /**
+   * Retrieves all taxes.
+   *
+   * @param {EntityManager} [manager] - EntityManager to use for the query.
+   * @returns {Promise<Tax[]>} - Promise resolving to an array of tax data.
+   */
+  public async getTaxes(manager?: EntityManager): Promise<Tax[]> {
+    const taxes = await this.taxRepository.find();
+    return taxes;
   }
 
   /**

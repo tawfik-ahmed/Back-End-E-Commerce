@@ -46,8 +46,17 @@ export class Product {
     precision: 20,
     scale: 2,
     transformer: {
-      to: (value: number) => value,
-      from: (value: string) => Number(value),
+      to: (value: number) => {
+        const num = Number(value);
+        return isNaN(num) ? 0 : num;
+      },
+      from: (value: string | null) => {
+        if (value === null || value === undefined) {
+          return 0;
+        }
+
+        return parseFloat(value);
+      },
     },
   })
   price: number;

@@ -40,6 +40,9 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  sessionId: string;
+
   @ManyToOne(() => User, (user) => user.orders)
   user: User;
 
@@ -98,7 +101,7 @@ export class Order {
   isDelivered: boolean;
 
   @Column({ nullable: true, type: 'timestamp' })
-  deliveredAt: Date;
+  deliveredAt: Date | null;
 
   @Column(() => ShippingAddress)
   shippingAddress: ShippingAddress;

@@ -276,13 +276,13 @@ export class CartService {
 
       userCart.coupons.push(coupon);
 
-      const couponDiscount = userCart.coupons.reduce(
+      const couponsDiscount = userCart.coupons.reduce(
         (sum, c) => sum + (Number(c.discount) || 0),
         0,
       );
       userCart.totalPriceAfterDiscount = Math.max(
         0,
-        userCart.totalPrice - couponDiscount,
+        userCart.totalPrice - couponsDiscount,
       );
 
       await cartRepo.save(userCart);
@@ -318,6 +318,34 @@ export class CartService {
   }
 
   /**
+   * Resets a cart by cart id.
+   *
+   * @param {number} userId - User id.
+   * @param {EntityManager} [manager] - EntityManager instance.
+   * @returns {Promise<Cart>} - Cart object.
+   * @throws {BadRequestException} If cart is not found.
+   */
+  public async resetCart(userId: number, manager?: EntityManager) {
+    const cartRepo = manager
+      ? manager.getRepository(Cart)
+      : this.cartRepository;
+
+    const cart = await this.getCartByUserId(userId, manager);
+
+    if (!cart) {
+      throw new BadRequestException('Cart not found');
+    }
+
+    cart.totalPrice = 0;
+    cart.totalPriceAfterDiscount = 0;
+    cart.coupons = [];
+    cart.items = [];
+
+    await cartRepo.save(cart);
+    return cart;
+  }
+
+  /**
    * Retrieves a cart by user id.
    *
    * @param {number} userId - User id.
@@ -328,7 +356,7 @@ export class CartService {
     const repo = manager ? manager.getRepository(Cart) : this.cartRepository;
     const cart = await repo.findOne({
       where: { user: { id: userId } },
-      relations: ['items', 'items.product', 'coupons'],
+      relations: ['items', 'items.product', 'items.product.images', 'coupons'],
     });
 
     return cart;
