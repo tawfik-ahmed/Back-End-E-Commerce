@@ -338,7 +338,6 @@ export class CartService {
 
     cart.totalPrice = 0;
     cart.totalPriceAfterDiscount = 0;
-    cart.coupons = [];
     cart.items = [];
 
     await cartRepo.save(cart);

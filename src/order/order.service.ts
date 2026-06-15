@@ -190,19 +190,32 @@ export class OrderService {
     });
   }
 
-  findAll() {
-    return `This action returns all order`;
+  public async update() {}
+
+  /**
+   * Retrieves user orders.
+   *
+   * @param {JwtPayloadType} payload - User data.
+   * @returns {Promise<{ ok: boolean; data: Order[] }>} - Object with ok property and orders data.
+   * @throws {NotFoundException} If user does not exist.
+   */
+  public async getMyOrders(payload: JwtPayloadType) {
+    const { id: userId } = payload;
+    return this.getUserOrders(userId);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  /**
+   * Retrieves user orders.
+   *
+   * @param {number} userId - User id.
+   * @returns {Promise<{ ok: boolean; data: Order[] }>} - Object with ok property and orders data.
+   * @throws {NotFoundException} If user does not exist.
+   */
+  public async getUserOrders(userId: number) {
+    const user = await this.userService.getUserById(userId);
+    const orders = await this.orderRepository.find({
+      where: { user: { id: user.id } },
+    });
+    return { ok: true, data: orders };
   }
 }

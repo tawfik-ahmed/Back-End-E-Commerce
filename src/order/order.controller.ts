@@ -22,7 +22,7 @@ import { FRONTEND_URL } from '../utils/constants';
 
 // ~ api/v1/carts/checkout
 @Controller('carts/checkout')
-export class OrderController {
+export class CheckoutCartController {
   constructor(private readonly orderService: OrderService) {}
 
   // success_url: 'http://localhost:3000/checkout/success',
@@ -48,26 +48,31 @@ export class OrderController {
     );
   }
 
-  @Get()
-  findAll() {
-    return this.orderService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.orderService.findOne(id);
-  }
-
   @Patch(':id')
-  update(
+  public update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
-    return this.orderService.update(id, updateOrderDto);
+    
+  }
+}
+
+// ~ api/v1/orders
+@Controller('orders')
+export class OrderController {
+  constructor(private readonly orderService: OrderService) {}
+
+  @Get()
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  @UseGuards(AuthGuard)
+  public findMe(@CurrentUser() payload: JwtPayloadType) {
+    return this.orderService.getMyOrders(payload);
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.orderService.remove(id);
+  @Get(':id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.getUserOrders(id);
   }
 }
