@@ -9,7 +9,10 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  Req,
+  Headers,
 } from '@nestjs/common';
+import type { RawBodyRequest } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
@@ -19,6 +22,8 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { CurrentUser } from '../user/decorators/current-user.decorator';
 import type { JwtPayloadType } from '../utils/types';
 import { FRONTEND_URL } from '../utils/constants';
+import { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 // ~ api/v1/carts/checkout
 @Controller('carts/checkout')
@@ -49,11 +54,13 @@ export class CheckoutCartController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
   public update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
-    
+    return this.orderService.updatePaidWithCash(id, updateOrderDto);
   }
 }
 
@@ -74,5 +81,19 @@ export class OrderController {
   @UseGuards(AuthGuard)
   public findOne(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.getUserOrders(id);
+  }
+}
+
+// ~ api/v1/webhooks
+@Controller('webhooks')
+export class WebhookController {
+  constructor(private readonly orderService: OrderService, private readonly configService: ConfigService) {}
+
+  @Post('stripe')
+  public async stripeWebhook(
+    @Headers('stripe-signature') signature: string,
+    @Req() request: RawBodyRequest<Request>,
+  ) {
+    return this.orderService.stripeWebhook(request.rawBody, signature, this.configService.get<string>('ENDPOINT_SECRET')!);
   }
 }

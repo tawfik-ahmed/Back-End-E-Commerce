@@ -112,9 +112,6 @@ export class OrderService {
         const order = orderRepo.create(orderData);
 
         if (orderData.orderPrice === 0) {
-          order.isPaid = true;
-          order.isDelivered = true;
-          order.deliveredAt = new Date();
           await this.productService.processSale(orderData.cartItems, manager);
         }
 
@@ -190,7 +187,119 @@ export class OrderService {
     });
   }
 
-  public async update() {}
+  /**
+   * Update an order paid status.
+   *
+   * @param {number} orderId - Order id.
+   * @param {UpdateOrderDto} updateOrderDto - Order data.
+   * @returns {Promise<{ ok: boolean; data: Order[] }>} - Object with ok property and orders data.
+   * @throws {NotFoundException} If order not found.
+   */
+  public async updatePaidWithCash(
+    orderId: number,
+    updateOrderDto: UpdateOrderDto,
+  ) {
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      throw new NotFoundException({
+        ok: false,
+        message: 'Order not found',
+      });
+    }
+
+    if (order.paymentMethod !== paymentMethod.CASH) {
+      throw new BadRequestException({
+        ok: false,
+        message: 'Order payment method is not cash',
+      });
+    }
+
+    if (order.isPaid) {
+      throw new BadRequestException({
+        ok: false,
+        message: 'Order is already paid',
+      });
+    }
+
+    if (updateOrderDto.isPaid) {
+      await this.orderRepository.update(orderId, {
+        ...updateOrderDto,
+        isPaid: true,
+        isDelivered: true,
+        deliveredAt: new Date(),
+      });
+      await this.orderRepository.save(order);
+    }
+
+    return {
+      ok: true,
+      message: 'Order updated successfully',
+      order,
+    };
+  }
+
+  public async stripeWebhook(
+    body: any,
+    signature: string,
+    endpointSecret: string,
+  ) {
+    let event;
+
+    try {
+      event = this.stripe.webhooks.constructEvent(
+        body,
+        signature,
+        endpointSecret,
+      );
+    } catch (error: any) {
+      throw new BadRequestException({
+        ok: false,
+        message: error.message,
+      });
+    }
+
+    console.log(event);
+
+    switch (event.type) {
+      case 'checkout.session.completed':
+        const sessionId = event.data.object.id;
+
+        const order = await this.orderRepository.findOne({
+          where: { sessionId: sessionId },
+          relations: ['user', 'cartItems', 'cartItems.product'],
+        });
+
+        if (!order) {
+          throw new NotFoundException({
+            ok: false,
+            message: 'Order not found',
+          });
+        }
+
+        await this.orderRepository.update(order.id, {
+          isPaid: true,
+          isDelivered: true,
+          deliveredAt: new Date(),
+        });
+        await this.orderRepository.save(order);
+
+        await Promise.all([
+          await this.cartService.resetCart(order.user.id),
+          await this.productService.processSale(order.cartItems),
+        ]);
+        break;
+      default:
+        console.log(`Unhandled event type ${event.type}.`);
+    }
+
+    return {
+      ok: true,
+      message: 'Order updated successfully',
+    };
+  }
 
   /**
    * Retrieves user orders.
