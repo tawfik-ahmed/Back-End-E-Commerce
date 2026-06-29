@@ -1,21 +1,25 @@
 import {
+  Body,
   Controller,
-  FileTypeValidator,
-  MaxFileSizeValidator,
-  ParseFilePipe,
+  Delete,
   Post,
   UploadedFile,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { UploadFilesService } from './upload-files.service';
-import { CreateUploadFileDto } from './dtos/create-upload-file.dto';
-import { UpdateUploadFileDto } from './dtos/update-upload-file.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { Roles } from '../user/decorators/roles.decorator';
 import { UserRole } from '../utils/enums';
-import { createImageUploadPipe } from './pipes/file-upload.pipe';
+import { Multer } from 'multer';
+import {
+  createImagesUploadPipe,
+  createImageUploadPipe,
+} from './pipes/file-upload.pipe';
+import { CurrentUser } from '../user/decorators/current-user.decorator';
+import type { JwtPayloadType } from '../utils/types';
 
 // ~api/v1/images
 @Controller('upload-files')
@@ -29,15 +33,56 @@ export class UploadFilesController {
   public uploadImage(
     @UploadedFile(createImageUploadPipe(2 * 1024 * 1024))
     file: Express.Multer.File,
+    @CurrentUser() payload: JwtPayloadType,
   ) {
-    return this.uploadFilesService.uploadProfileImage(file);
+    return this.uploadFilesService.uploadProfileImage(
+      file,
+      payload.id.toString(),
+    );
   }
 
-  @Post('product-image')
-  uploadProductImage(
+  @Delete('profile-image')
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN, UserRole.USER)
+  public deleteProfileImage(@CurrentUser() payload: JwtPayloadType) {
+    return this.uploadFilesService.deleteProfileImage(payload.id.toString());
+  }
+
+  @Post('product-cover')
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  public uploadProductCover(
     @UploadedFile(createImageUploadPipe(5 * 1024 * 1024))
     file: Express.Multer.File,
+    @Body('productName') productName: string,
   ) {
-    return this.uploadFilesService.uploadProductImage(file);
+    return this.uploadFilesService.uploadProductCover(file, productName);
+  }
+
+  @Delete('product-cover')
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  public deleteProductCover(@Body('productName') productName: string) {
+    return this.uploadFilesService.deleteProductCover(productName);
+  }
+
+  @Post('product-images')
+  @UseInterceptors(FilesInterceptor('file[]', 5))
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  public uploadProductImages(
+    @UploadedFiles(createImagesUploadPipe(5 * 1024 * 1024))
+    files: Array<Express.Multer.File>,
+    @Body('productName') productName: string,
+  ) {
+    return this.uploadFilesService.uploadProductImages(files, productName);
+  }
+
+  @Delete('product-images')
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN)
+  public deleteProductImages(@Body('publicIds') publicIds: string[]) {
+    return this.uploadFilesService.deleteProductImages(publicIds);
   }
 }

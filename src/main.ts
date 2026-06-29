@@ -7,6 +7,7 @@ async function bootstrap() {
     rawBody: true,
     bodyParser: true,
   });
+  app.enableCors();
   app.setGlobalPrefix('/api/v1');
 
   app.useGlobalPipes(
