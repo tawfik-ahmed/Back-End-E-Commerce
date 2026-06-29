@@ -31,6 +31,7 @@ import { Cart } from './cart/entities/cart.entity';
 import { CartItem } from './cart/entities/cart-item.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
+import { UploadFilesModule } from './upload-files/upload-files.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { Order } from './order/entities/order.entity';
     ReviewModule,
     CartModule,
     OrderModule,
+    UploadFilesModule,
   ],
   controllers: [],
   providers: [],
