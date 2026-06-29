@@ -5,8 +5,7 @@ import * as streamifier from 'streamifier';
 import { Multer } from 'multer';
 
 @Injectable()
-export class CloudinaryService {
-
+export class UploadFilesService {
   /**
    * Uploads a file to Cloudinary
    * @param {Multer.File} file
@@ -28,11 +27,20 @@ export class CloudinaryService {
   }
 
   /**
-   * Uploads a file to Cloudinary
+   * Uploads a profile image to Cloudinary
    * @param {Multer.File} file
    * @returns {Promise<CloudinaryResponse>}
    */
-  public uploadImage(file: Express.Multer.File) {
+  public uploadProfileImage(file: Express.Multer.File) {
+    return this.uploadFile(file);
+  }
+
+  /**
+   * Uploads a product image to Cloudinary
+   * @param {Multer.File} file
+   * @returns {Promise<CloudinaryResponse>}
+   */
+  public uploadProductImage(file: Express.Multer.File) {
     return this.uploadFile(file);
   }
 }
