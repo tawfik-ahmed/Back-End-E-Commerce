@@ -6,6 +6,12 @@ import { Multer } from 'multer';
 
 @Injectable()
 export class CloudinaryService {
+
+  /**
+   * Uploads a file to Cloudinary
+   * @param {Multer.File} file
+   * @returns {Promise<CloudinaryResponse>}
+   */
   public uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
     return new Promise<CloudinaryResponse>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
@@ -19,5 +25,14 @@ export class CloudinaryService {
 
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
     });
+  }
+
+  /**
+   * Uploads a file to Cloudinary
+   * @param {Multer.File} file
+   * @returns {Promise<CloudinaryResponse>}
+   */
+  public uploadImage(file: Express.Multer.File) {
+    return this.uploadFile(file);
   }
 }

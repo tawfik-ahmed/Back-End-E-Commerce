@@ -14,15 +14,15 @@ import { Roles } from '../user/decorators/roles.decorator';
 import { UserRole } from '../utils/enums';
 
 // ~api/v1/images
-@Controller('images')
+@Controller('upload-files')
 export class UploadFilesController {
   constructor(private readonly cloudinaryService: CloudinaryService) {}
 
-  @Post('upload')
+  @Post('image')
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(AuthGuard)
   @Roles(UserRole.ADMIN, UserRole.USER)
   public uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return this.cloudinaryService.uploadFile(file);
+    return this.cloudinaryService.uploadImage(file);
   }
 }
