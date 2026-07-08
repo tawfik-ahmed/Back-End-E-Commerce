@@ -18,6 +18,7 @@ import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { CartItem } from '../cart/entities/cart-item.entity';
 import { ProductService } from '../product/product.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class OrderService {
@@ -33,12 +34,22 @@ export class OrderService {
     private readonly dataSource: DataSource,
     private readonly configService: ConfigService,
     private readonly productService: ProductService,
+    private readonly mailerService: MailerService,
   ) {
     this.stripe = new Stripe(
       this.configService.get<string>('STRIPE_SECRET_KEY')!,
     );
   }
 
+  /**
+   * Create a new order
+   *
+   * @param {CreateOrderDto} createOrderDto - Order data.
+   * @param {string} paymentMethodType - Payment method type.
+   * @param {JwtPayloadType} payload - User data.
+   * @param {any} linksAfterPayment - Payment links.
+   * @returns {Promise<Order>} - Order data.
+   */
   public createOrder(
     createOrderDto: CreateOrderDto,
     paymentMethodType: string,
@@ -169,7 +180,6 @@ export class OrderService {
         order.sessionId = session.id;
 
         await orderRepo.save(order);
-        await this.cartService.resetCart(userId, manager);
 
         return {
           ok: true,
@@ -201,6 +211,7 @@ export class OrderService {
   ) {
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
+      relations: ['user'],
     });
 
     if (!order) {
@@ -234,6 +245,16 @@ export class OrderService {
       await this.orderRepository.save(order);
     }
 
+    await this.mailerService.sendMail({
+      from: `Back-End E-Commerce NestJS <${this.configService.get<string>('SMTP_USER')}>`,
+      to: order.user.email,
+      subject: 'Back-End E-Commerce NestJS - Order Paid Successfully (Cash)',
+      html: `<div>
+        <h1>Order #${order.id} has been paid</h1>
+        <p>Thank you for using our service!</p>
+        <p>Best regards,<br/>Back-End E-Commerce NestJS</p>
+      </div>`,
+    });
     return {
       ok: true,
       message: 'Order updated successfully',
@@ -241,6 +262,17 @@ export class OrderService {
     };
   }
 
+  /**
+   * Update an order paid status.
+   *
+   * @param {any} body - Order data.
+   * @param {string} signature - Order data.
+   * @param {string} endpointSecret - Order data.
+   * @returns {Promise<{ ok: boolean; data: Order[] }>} - Object with ok property and orders data.
+   * @throws {NotFoundException} If order not found.
+   * @throws {BadRequestException} If order payment method is not cash.
+   * @throws {BadRequestException} If order is already paid.
+   * */
   public async stripeWebhook(
     body: any,
     signature: string,
@@ -260,8 +292,6 @@ export class OrderService {
         message: error.message,
       });
     }
-
-    console.log(event);
 
     switch (event.type) {
       case 'checkout.session.completed':
@@ -290,6 +320,14 @@ export class OrderService {
           await this.cartService.resetCart(order.user.id),
           await this.productService.processSale(order.cartItems),
         ]);
+
+        await this.mailerService.sendMail({
+          from: `Back-End E-Commerce NestJS <${this.configService.get<string>('SMTP_USER')}>`,
+          to: order.user.email,
+          subject: 'Order Paid Successfully',
+          html: `<h1>Paid</h1>`,
+        });
+
         break;
       default:
         console.log(`Unhandled event type ${event.type}.`);

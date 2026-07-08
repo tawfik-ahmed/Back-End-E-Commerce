@@ -5,14 +5,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { EntityManager, getMetadataArgsStorage, Like, Repository } from 'typeorm';
+import {
+  EntityManager,
+  getMetadataArgsStorage,
+  Like,
+  Repository,
+} from 'typeorm';
 import { User } from './entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UserRole } from '../utils/enums'; 
-import { JwtPayloadType } from '../utils/types'; 
-import { AuthService } from '../auth/auth.service'; 
+import { UserRole } from '../utils/enums';
+import { JwtPayloadType } from '../utils/types';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
