@@ -33,6 +33,7 @@ import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
 import { UploadFilesModule } from './upload-files/upload-files.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { OAuthModule } from './oauth/oauth.module';
 
 @Module({
   imports: [
@@ -103,6 +104,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     CartModule,
     OrderModule,
     UploadFilesModule,
+    OAuthModule,
   ],
   controllers: [],
   providers: [],

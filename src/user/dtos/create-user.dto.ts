@@ -33,38 +33,38 @@ export class CreateUserDto {
 
   @IsEnum(UserRole, { message: 'Incorrect role' })
   @IsOptional()
-  role: UserRole;
+  role?: UserRole;
 
   @IsNumber()
   @Min(10, { message: 'Incorrect age' })
   @Max(100, { message: 'Incorrect age' })
   @IsOptional()
-  age: number;
+  age?: number;
 
   @IsString()
   @IsUrl({}, { message: 'avatar must be a valid url' })
   @IsOptional()
-  avatar: string;
+  avatar?: string;
 
   @IsString()
   @IsPhoneNumber('EG', { message: 'Incorrect phone number' })
   @IsOptional()
-  phoneNumber: string;
+  phoneNumber?: string;
 
   @IsString()
   @MaxLength(100, { message: 'Address must be no more than 100 characters' })
   @IsOptional()
-  address: string;
+  address?: string;
 
   @IsEnum(UserGender, { message: 'Incorrect gender' })
   @IsOptional()
-  gender: UserGender;
+  gender?: UserGender;
 
   @IsBoolean()
   @IsOptional()
-  isActive: boolean;
+  isActive?: boolean;
 
   @IsString()
   @IsOptional()
-  verificationCode: string;
+  verificationCode?: string;
 }
