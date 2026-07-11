@@ -32,9 +32,16 @@ import { CartItem } from './cart/entities/cart-item.entity';
 import { OrderModule } from './order/order.module';
 import { Order } from './order/entities/order.entity';
 import { UploadFilesModule } from './upload-files/upload-files.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -71,7 +78,7 @@ import { UploadFilesModule } from './upload-files/upload-files.module';
           Review,
           Cart,
           CartItem,
-          Order
+          Order,
         ],
         namingStrategy: new SnakeNamingStrategy(),
         // dropSchema: true,
