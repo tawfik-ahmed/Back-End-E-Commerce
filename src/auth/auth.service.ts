@@ -4,7 +4,7 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { User } from '../user/entites/user.entity'; 
+import { User } from '../user/entites/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -33,11 +33,15 @@ export class AuthService {
    * @throws {BadRequestException} If a user with the same email already exists.
    *
    * @param {AuthDto} dto - User data.
-   * @returns {Promise<{ ok: boolean, token: string, message: string, data: User }>} - Object with ok property, jwt token and user data.
+   * @returns {Promise<{ ok: boolean, access_token: string, refresh_token: string, message: string, data: User }>} - Object with ok property, jwt token and user data.
    */
-  public async signUp(
-    dto: SignUpDto,
-  ): Promise<{ ok: boolean; token: string; message: string; data: User }> {
+  public async signUp(dto: SignUpDto): Promise<{
+    ok: boolean;
+    access_token: string;
+    refresh_token: string;
+    message: string;
+    data: User;
+  }> {
     const isUserExists = await this.userService.isExistsByEmail(dto.email);
 
     if (isUserExists) {
@@ -54,10 +58,13 @@ export class AuthService {
     });
     await this.userRepository.save(user);
 
-    const jwtToken = await this.generateJwtToken(user);
+    const accessToken = await this.generateJwtAccessToken(user);
+    const refreshToken = await this.generateJwtRefreshToken(user);
+
     return {
       ok: true,
-      token: jwtToken,
+      access_token: accessToken,
+      refresh_token: refreshToken,
       message: 'User created successfully',
       data: user,
     };
@@ -70,11 +77,15 @@ export class AuthService {
    * @throws {BadRequestException} If password is incorrect.
    *
    * @param {SignInDto} dto - User data.
-   * @returns {Promise<{ ok: boolean, token: string, message: string, data: User }>} - Object with ok property, jwt token and user data.
+   * @returns {Promise<{ ok: boolean, access_token: string, refresh_token: string, message: string, data: User }>} - Object with ok property, jwt token and user data.
    */
-  public async signIn(
-    dto: SignInDto,
-  ): Promise<{ ok: boolean; token: string; message: string; data: User }> {
+  public async signIn(dto: SignInDto): Promise<{
+    ok: boolean;
+    access_token: string;
+    refresh_token: string;
+    message: string;
+    data: User;
+  }> {
     const user = await this.userService.getUserByEmail(dto.email);
 
     if (!user) {
@@ -90,11 +101,13 @@ export class AuthService {
       });
     }
 
-    const jwtToken = await this.generateJwtToken(user);
+    const accessToken = await this.generateJwtAccessToken(user);
+    const refreshToken = await this.generateJwtRefreshToken(user);
 
     return {
       ok: true,
-      token: jwtToken,
+      access_token: accessToken,
+      refresh_token: refreshToken,
       message: 'User signed in successfully',
       data: user,
     };
@@ -174,6 +187,36 @@ export class AuthService {
   }
 
   /**
+   * Refreshes the access token for the given refresh token.
+   *
+   * @param {string} refreshToken - Refresh token.
+   * @returns {Promise<{ ok: boolean, access_token: string}>} - Object with ok property, access token
+   * @throws {BadRequestException} If the refresh token is invalid.
+   */
+  public async refreshToken(
+    refreshToken: string,
+  ): Promise<{ ok: boolean; access_token: string }> {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.config.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+      });
+
+      const { iat, exp, ...user } = payload;
+      const accessToken = await this.generateJwtAccessToken(user as User);
+
+      return {
+        ok: true,
+        access_token: accessToken,
+      };
+    } catch (error) {
+      throw new BadRequestException({
+        ok: false,
+        message: 'please login again',
+      });
+    }
+  }
+
+  /**
    * Verify the verification code for the given user.
    *
    * @throws {BadRequestException} If the verification code is incorrect.
@@ -223,13 +266,29 @@ export class AuthService {
   }
 
   /**
-   * Generates a jwt token based on the given user data.
+   * Generates a jwt access token based on the given user data.
    *
    * @param {User} user - User data.
    * @returns {Promise<string>} - Jwt token.
    */
-  public async generateJwtToken(user: User): Promise<string> {
+  public async generateJwtAccessToken(user: User): Promise<string> {
     const payload = { id: user.id, role: user.role };
     return this.jwtService.signAsync(payload);
+  }
+
+  /**
+   * Generates a jwt refresh token based on the given user data.
+   *
+   * @param {User} user - User data.
+   * @returns {Promise<string>} - Jwt token.
+   */
+  public async generateJwtRefreshToken(user: User): Promise<string> {
+    const payload = { id: user.id, role: user.role };
+    return this.jwtService.signAsync(payload, {
+      secret: this.config.get<string>('JWT_REFRESH_TOKEN_SECRET')!,
+      expiresIn: this.config.get<string>(
+        'JWT_REFRESH_TOKEN_EXPIRES_IN',
+      )! as any,
+    });
   }
 }

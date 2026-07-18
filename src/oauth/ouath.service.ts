@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { AuthService } from '../auth/auth.service';
+import { User } from '../user/entites/user.entity';
 
 type UserData = {
   userId: string;
@@ -30,7 +31,19 @@ export class OAuthService {
     private authService: AuthService,
   ) {}
 
-  public async validateUser(userData: UserData) {
+  /**
+   * Validates the user data and generates a JWT token.
+   * @param {UserData} userData
+   * @returns {Promise<{ ok: boolean; access_token: string; refresh_token: string;  user: User }>}
+   */
+  public async validateUser(
+    userData: UserData,
+  ): Promise<{
+    ok: boolean;
+    access_token: string;
+    refresh_token: string;
+    user: User;
+  }> {
     const exists = await this.userService.isExistsByEmail(userData.email);
     let user;
 
@@ -46,7 +59,13 @@ export class OAuthService {
     } else {
       user = await this.userService.getUserByEmail(userData.email);
     }
-    const accessToken = await this.authService.generateJwtToken(user);
-    return { ok: true, accessToken, user };
+    const accessToken = await this.authService.generateJwtAccessToken(user);
+    const refreshToken = await this.authService.generateJwtRefreshToken(user);
+    return {
+      ok: true,
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      user,
+    };
   }
 }

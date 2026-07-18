@@ -2,6 +2,7 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Param,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
@@ -48,5 +49,10 @@ export class AuthController {
   @Post('change-password')
   public changePassword(@Body() changePasswordDto: SignInDto) {
     return this.authService.changePassword(changePasswordDto);
+  }
+
+  @Post('refresh-token/:refreshToken')
+  public refreshToken(@Param('refreshToken') refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
   }
 }
