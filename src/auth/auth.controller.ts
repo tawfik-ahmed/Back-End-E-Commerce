@@ -4,27 +4,76 @@ import {
   Controller,
   Param,
   Post,
+  Req,
+  Res,
   UseInterceptors,
 } from '@nestjs/common';
+import type { Request, Response } from 'express';
+
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ConfigService } from '@nestjs/config';
 
 // ~ api/v1/auth
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('sign-up')
-  public signUp(@Body() signUpDto: SignUpDto) {
-    return this.authService.signUp(signUpDto);
+  public async signUp(
+    @Body() signUpDto: SignUpDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { access_token, refresh_token, ...rest } =
+      await this.authService.signUp(signUpDto);
+
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    return rest;
   }
 
   @Post('sign-in')
-  public signIn(@Body() signInDto: SignInDto) {
-    return this.authService.signIn(signInDto);
+  public async signIn(
+    @Body() signInDto: SignInDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { access_token, refresh_token, ...rest } =
+      await this.authService.signIn(signInDto);
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    return rest;
   }
 
   @Post('reset-password')
@@ -51,8 +100,25 @@ export class AuthController {
     return this.authService.changePassword(changePasswordDto);
   }
 
-  @Post('refresh-token/:refreshToken')
-  public refreshToken(@Param('refreshToken') refreshToken: string) {
-    return this.authService.refreshToken(refreshToken);
+  @Post('refresh-token')
+  public async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies.refresh_token;
+    const { access_token, ...rest } =
+      await this.authService.refreshToken(refreshToken);
+
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return rest;
   }
 }
