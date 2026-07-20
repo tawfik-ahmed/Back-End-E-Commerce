@@ -1,98 +1,228 @@
+
+# 🛒 Back-End E-Commerce Platform
+
+A production-ready RESTful API built with **NestJS**, **TypeORM**, and **MySQL**. The system is designed using a clean, modular architecture, handling everything from secure authentication and complex catalog relations to a dynamic cart system and Stripe payment integration.
+
+---
+
+## 📸 System Architecture & Database Design
+
+Here are the blueprints showcasing how the system modules interact and how the database entities are structurally related:
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="docs/images/system-design.png" alt="System Design" width="48%" />
+  <img src="docs/images/database-diagram.png" alt="Database Diagram" width="48%" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Core Features
 
-## Description
+- **Authentication & Authorization:** Complete local auth loop (Sign-Up, Sign-In, Password Reset via OTP) and Social Auth via Google OAuth2.0.
+- **Role-Based Access Control (RBAC):** Hierarchical guard system restricting administrative capabilities exclusively to accounts with an `admin` role.
+- **Multi-Level Product Catalog:** Granular classification tree structured through Categories, nested Sub-Categories, and Brands.
+- **Dynamic Inventory System:** Full tracking of stock levels, sales counts (`sold`), colors, and product variants.
+- **Dynamic Cart & Coupon Engine:** Dynamic item subtotal computations on user sessions with dynamic deduction mechanics upon applying live promotional codes.
+- **Comprehensive Review Engine:** Verified customer interaction flow allowing automated rating configurations and structured text feedback per product.
+- **Dual Checkout Channels:** Support for structured automated billing streams processing Cash on Delivery or Card Payments.
+- **B2B Procurement Ledger:** System management endpoints for tracing external product Suppliers and processing operational Restocking Requests.
+- **Dynamic Pricing Configuration:** Upsertable administrative control metrics managing uniform tax values and dynamic flat-rate shipping prices at checkout.
+- **Automated Cloud Storage File Uploading:** Multipart data stream parsing for asynchronous profile avatar binding and multi-image product gallery storage.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 🛠️ Tech Stack & Architecture Highlights
 
-```bash
-$ npm install
+### Framework & Language
+
+- **NestJS (v11):** Node.js framework utilizing highly modular architecture layers.
+- **TypeScript (v5.9):** Strict static typing configuration for structural compilation safety.
+
+### Database & Storage
+
+- **MySQL (v3.19 Driver):** Relational storage engine optimized using structural database indexing strategies.
+- **TypeORM (v0.3.28):** Data Mapper ORM managing automated migration trees and dynamic relational mappings.
+- **Cloudinary (v2.10.0):** Cloud-native media storage handling profile avatars and multi-image product galleries.
+
+### Security & Guards
+
+- **JWT (@nestjs/jwt):** Decoupled stateless authentication mechanisms processing Access and Refresh token lifecycles.
+- **Passport.js:** Social identity abstraction handling Google OAuth20 verification strategies.
+- **Bcrypt (v6.0.0):** Computational security processing cryptographic password salting and hashing.
+- **Helmet (v8.2.0):** Automated HTTP request boundary header shielding.
+- **NestJS Throttler (v6.5.0):** Strategic API rate limiting mechanics to mitigate brute-force vector threats.
+
+### Communications & Billing
+
+- **Stripe (v22.2.0):** Integrated commercial checkout gateway managing secure webhook payment transaction confirmations.
+- **Nodemailer & NestJS Mailer:** Automated SMTP server connection maps processing immediate credential recovery verification tokens.
+
+---
+
+## 📂 Project Structure
+
+```text
+BACK-END E-COMMERCE
+├── 📁 dist                   # Compiled production code
+├── 📁 docs                   # Project blueprints, design assets & API testing documentation
+│   ├── 📁 images             # Design assets for the README
+│   └── 📁 postman            # Embedded API documentation environment sandbox
+│       ├── 📁 collections    # Segmented JSON collections covering full module routes
+│       └── 📄 environment.json # Active baseline target environment parameters
+├── 📁 src                    # Main application source code
+│   ├── 📁 auth               # Credentials authentication & OTP password reset
+│   ├── 📁 oauth              # Google social authentication strategy
+│   ├── 📁 user               # User profiles & Admin user management control
+│   ├── 📁 category           # Level-0 product taxonomy
+│   ├── 📁 sub-category       # Nested child categories mapped to parents
+│   ├── 📁 brand              # Product brand/manufacturer metadata
+│   ├── 📁 product            # Core catalog handling stocks, pricing, and variants
+│   ├── 📁 review             # User ratings and product feedback
+│   ├── 📁 cart               # Dynamic cart calculations, item modification & coupons
+│   ├── 📁 order              # Checkout flows (Cash on Delivery & Card via Stripe)
+│   ├── 📁 coupon             # Dynamic promotional code management
+│   ├── 📁 supplier           # Supplier tracking operations
+│   ├── 📁 request-product    # Staff procurement & restocking requests
+│   ├── 📁 tax                # Global configurations for dynamic tax & shipping prices
+│   ├── 📁 upload-files       # Interceptors route mapping to Cloudinary storage
+│   ├── 📁 utils              # Shareable global helper methods
+│   ├── 📄 app.module.ts      # Application root module matching dependency trees
+│   └── 📄 main.ts            # Application bootstrap entrypoint
+└── 📁 test                   # E2E integration test suites
 ```
 
-## Compile and run the project
+---
+
+## ⚙️ Core System Workflows
+
+### 1. Advanced Auth & Token Management
+
+- Uses a **Dual-Token System**: Short-lived Access Tokens for authenticated routes and long-lived Refresh Tokens to dynamically maintain user sessions.
+- Includes a full **Password Reset Cycle** utilizing secure email delivery for time-sensitive, numeric verification codes.
+
+### 2. Multi-Level E-Commerce Hierarchy
+
+- Maintains strict relational consistency across `Categories` ➡️ `Sub-Categories` ➡️ `Brands` ➡️ `Products`.
+- Includes database-level index optimizations and strict relational integrity policies to secure massive catalog listings.
+
+### 3. Live Cart Calculations & Coupon Engine
+
+- The cart logic runs natively on database sessions, dynamically computing prices, quantity checks, and current inventory availability on every update.
+- Coupons are parsed through validation checks (`expireDate` and status updates) before mutating subtotal configurations.
+
+### 4. Checkout Operations (Stripe Integration)
+
+- **Cash on Delivery:** Direct processing workflow that updates stock inventories and terminates the active cart session safely.
+- **Card Payment:** Communicates with Stripe API to serve secure tokens. The system utilizes structured Webhook endpoints listening for `payment_intent.succeeded` events to switch order states automatically.
+
+### 5. Standardized DTO Validation & Guards
+
+- All inbound payloads are strict-mapped using `class-validator` and stripped of un-whitelisted properties via a global `ValidationPipe`.
+- Role management explicitly locks administrative endpoints (`/api/v1/users`, `/api/v1/categories` mutations, etc.) to accounts mapped out with an `admin` role.
+
+---
+
+## 🚦 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 / v20 or higher)
+- MySQL active server instance
+
+### Setup & Run
+
+1. **Clone the project:**
 
 ```bash
-# development
-$ npm run start
+git clone <your-repo-url>
+cd back-end-e-commerce
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Run tests
+2. **Install dependencies:**
 
 ```bash
-# unit tests
-$ npm run test
+npm install
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
-## Deployment
+3. **Setup environment variables:**
+   Create a `.env` file inside the root directory of the application and map the active credentials exactly as structured below:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```env
+PORT=3000
+NODE_ENV=development
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+# DB Settings
+DATABASE_TYPE=mysql
+DATABASE_HOST=localhost
+DATABASE_PORT=
+DATABASE_USERNAME=root
+DATABASE_NAME=
+DATABASE_PASSWORD=
+
+# JWT Architecture Secrets
+JWT_SECRET=
+JWT_EXPIRES_IN=
+JWT_REFRESH_TOKEN_SECRET=
+JWT_REFRESH_TOKEN_EXPIRES_IN=
+
+# Hash
+SALT=
+
+# Mailer Configurations
+SMTP_USER=
+SMTP_PASSWORD=
+
+# Stripe Commercial Credentials
+STRIPE_SECRET_KEY=
+ENDPOINT_SECRET=
+
+# Cloudinary Media Storage Accounts
+CLOUDINARY_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+# OAuth Social Credentials
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+```
+
+4. **Launch the application:**
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Development hot-reload mode
+npm run start:dev
+
+# Production mode execution
+npm run start:prod
+
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📬 API Documentation & Postman Setup
 
-Check out a few resources that may come in handy when working with NestJS:
+> 💡 **Notice:** The **Postman Folder** is securely localized inside the **`docs/`** directory (`docs/postman`). It contains complete, production-ready documentation alongside pre-configured target testing environments. Each distinct API endpoint contains a thorough breakdown layout outlining payload structures, required authentication parameters, and functional behavior scopes.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Modular Collection Structure
 
-## Support
+The Postman sandbox is split into dedicated collection entities mirroring the core module controllers:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- **Auth Module:** Manages credentials parsing (`/api/v1/auth`), validation rules for Sign-up/Sign-in actions, and the secure verification logic powering the OTP recovery cycle.
+- **OAuth Module:** Simulates external callbacks (`/api/v1/auth/google`) confirming federated OAuth identity parameters.
+- **User Module:** Houses protected administrative endpoints handling global profile mutations, retrieval listings, and administrative user controls (`/api/v1/users`).
+- **Category & Sub-Category Modules:** Structures hierarchical endpoints executing level-0 catalog generation and child sub-category nested trees.
+- **Brand & Product Modules:** Oversees inventory entity storage matrices, monitoring prices, stock limits, variant colors, and product sales fields.
+- **Review Module:** Maps public reading routes and restricted customer endpoints processing verified text feedback and numerical rating evaluations.
+- **Cart & Coupon Modules:** Manages dynamic database-backed session structures computing shopping basket adjustments, inventory availability verification, and coupon value calculations.
+- **Order Module:** Directs checkout actions routing cash transactions or card parameters via Stripe SDK, processing events via dedicated webhook pathways.
+- **Supplier & Request-Product Modules:** Internal system pathways allowing administrative tracking of third-party wholesale supplier accounts and backend supply procurement logs.
+- **Tax Module:** Restricted backend configuration settings adjusting standard tax parameters and dynamic shipping price constants globally.
 
-## Stay in touch
+### Importing Environment Sandbox
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+1. Locate the files within `docs/postman/collections/` and the environment mapping at `docs/postman/environment.json`.
+2. Import the chosen collections along with the JSON environment descriptor directly into your Postman Workspace.
+3. Select the imported environment target to automatically authorize variables (`{{base_url}}`, active token overrides) across every automated testing endpoint layout.
