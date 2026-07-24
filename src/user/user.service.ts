@@ -15,9 +15,10 @@ import { User } from './entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UserRole } from '../utils/enums';
 import { JwtPayloadType } from '../utils/types';
 import { AuthService } from '../auth/auth.service';
+import { Supplier } from '../supplier/entities/supplier.entity';
+import { UserRole } from '../utils/enums';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,8 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
+    @InjectRepository(Supplier)
+    private readonly supplierRepository: Repository<Supplier>,
   ) {}
 
   /**
@@ -196,11 +199,120 @@ export class UserService {
   public async updateMe(
     payload: JwtPayloadType,
     dto: UpdateUserDto,
-  ): Promise<{ ok: boolean; data: User }> {
+  ): Promise<{ ok: boolean; data: User; message: string }> {
     const user = await this.getUserById(payload.id);
+
+    if (dto.role) {
+      if (dto.role !== UserRole.SUPPLIER) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Invalid role',
+        });
+      }
+
+      if (user.role === UserRole.SUPPLIER) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'You are already a supplier',
+        });
+      }
+
+      if (!dto.companyName || !dto.website) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Company name and website are required',
+        });
+      }
+
+      const supplier = await this.supplierRepository.findOne({
+        where: {
+          user: {
+            id: user.id,
+          },
+        },
+        relations: {
+          user: true,
+        },
+      });
+
+      const companyExists = await this.supplierRepository.findOne({
+        where: {
+          companyName: dto.companyName,
+        },
+      });
+
+      if (companyExists && (!supplier || companyExists.id !== supplier.id)) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Company name already exists',
+        });
+      }
+
+      const websiteExists = await this.supplierRepository.findOne({
+        where: {
+          website: dto.website,
+        },
+      });
+
+      if (websiteExists && (!supplier || websiteExists.id !== supplier.id)) {
+        throw new BadRequestException({
+          ok: false,
+          message: 'Website already exists',
+        });
+      }
+
+      if (supplier) {
+        if (supplier.isApproved) {
+          throw new BadRequestException({
+            ok: false,
+            message: 'You are already a supplier',
+          });
+        }
+
+        supplier.companyName = dto.companyName;
+        supplier.website = dto.website;
+        supplier.rejectionReason = null!;
+        supplier.isApproved = false;
+
+        await this.supplierRepository.save(supplier);
+
+        dto.role = undefined;
+        dto.companyName = undefined;
+        dto.website = undefined;
+
+        const updatedUser = this.userRepository.merge(user, dto);
+        await this.userRepository.save(updatedUser);
+        console.log("hi");
+        return {
+          ok: true,
+          message:
+            'Supplier request sent successfully. Waiting for admin approval.',
+          data: updatedUser,
+        };
+      }
+
+      await this.supplierRepository.save(
+        this.supplierRepository.create({
+          companyName: dto.companyName,
+          website: dto.website,
+          user,
+          isApproved: false,
+        }),
+      );
+
+      dto.role = undefined;
+      dto.companyName = undefined;
+      dto.website = undefined;
+    }
     const updatedUser = this.userRepository.merge(user, dto);
+
     await this.userRepository.save(updatedUser);
-    return { ok: true, data: updatedUser };
+
+    return {
+      ok: true,
+      message: 'Profile updated successfully',
+      data: updatedUser,
+    };
   }
 
   /**

@@ -1,4 +1,3 @@
-
 # 🛒 Back-End E-Commerce Platform
 
 A production-ready RESTful API built with **NestJS**, **TypeORM**, and **MySQL**. The system is designed using a clean, modular architecture, handling everything from secure authentication and complex catalog relations to a dynamic cart system and Stripe payment integration.
@@ -25,7 +24,7 @@ Here are the blueprints showcasing how the system modules interact and how the d
 - **Dynamic Cart & Coupon Engine:** Dynamic item subtotal computations on user sessions with dynamic deduction mechanics upon applying live promotional codes.
 - **Comprehensive Review Engine:** Verified customer interaction flow allowing automated rating configurations and structured text feedback per product.
 - **Dual Checkout Channels:** Support for structured automated billing streams processing Cash on Delivery or Card Payments.
-- **B2B Procurement Ledger:** System management endpoints for tracing external product Suppliers and processing operational Restocking Requests.
+- **Full Supplier Lifecycle & B2B Procurement:** End-to-end supplier management flow. Users can apply for supplier status (`/api/v1/users/me`), which admins review and approve/reject with feedback. Approved suppliers gain access to dedicated vendor operations, company profiles, dynamic stock restocking requests (`Request-Products`), and B2B procurement ledgers.
 - **Dynamic Pricing Configuration:** Upsertable administrative control metrics managing uniform tax values and dynamic flat-rate shipping prices at checkout.
 - **Automated Cloud Storage File Uploading:** Multipart data stream parsing for asynchronous profile avatar binding and multi-image product gallery storage.
 
@@ -120,6 +119,12 @@ BACK-END E-COMMERCE
 - All inbound payloads are strict-mapped using `class-validator` and stripped of un-whitelisted properties via a global `ValidationPipe`.
 - Role management explicitly locks administrative endpoints (`/api/v1/users`, `/api/v1/categories` mutations, etc.) to accounts mapped out with an `admin` role.
 
+### 6. End-to-End Supplier Request & Onboarding Workflow
+
+- **Application & Validation:** Users apply to become suppliers via profile endpoints by submitting company metrics (`companyName`, `website`). The system validates against duplicate company profiles and existing pending requests.
+- **Admin Verification Loop:** Requests are queued for administrative review. Admins can approve requests (which elevates the user's role to `SUPPLIER`) or reject them with a structured reason (`rejectionReason`).
+- **Procurement & Restocking:** Once approved, suppliers interact with product procurement channels to submit and manage stock replenishment requests (`/api/v1/request-products`).
+
 ---
 
 ## 🚦 Getting Started
@@ -204,7 +209,7 @@ npm run start:prod
 
 ## 📬 API Documentation & Postman Setup
 
-> 💡 **Notice:** The **Postman Folder** is securely localized inside the **`docs/`** directory (`docs/postman`). It contains complete, production-ready documentation alongside pre-configured target testing environments. Each distinct API endpoint contains a thorough breakdown layout outlining payload structures, required authentication parameters, and functional behavior scopes.
+> 💡 **Notice:** All endpoint routes and full API documentation are located inside the **`docs/postman`** directory. This includes complete, pre-configured testing collections and environment variables for direct execution in Postman.
 
 ### Modular Collection Structure
 
@@ -220,6 +225,8 @@ The Postman sandbox is split into dedicated collection entities mirroring the co
 - **Order Module:** Directs checkout actions routing cash transactions or card parameters via Stripe SDK, processing events via dedicated webhook pathways.
 - **Supplier & Request-Product Modules:** Internal system pathways allowing administrative tracking of third-party wholesale supplier accounts and backend supply procurement logs.
 - **Tax Module:** Restricted backend configuration settings adjusting standard tax parameters and dynamic shipping price constants globally.
+- **User & Supplier Application Modules:** Handles user profiles, role switches, and the full supplier onboarding request flow (`/api/v1/users/me` -> application submission, status updates, and admin approval checks).
+- **Supplier & Request-Product Modules:** Internal and vendor pathways for managing registered supplier profiles, updating company details, and processing product restocking requests.
 
 ### Importing Environment Sandbox
 

@@ -1,26 +1,61 @@
-import { CURRENT_TIMESTAMP } from '../../utils/constants'; 
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from '../../user/entites/user.entity';
+import { RequestProduct } from '../../request-product/entities/request-product.entity';
 
 @Entity()
 export class Supplier {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
+  @Column({ unique: true })
+  companyName: string;
 
-  @Column()
+  @Column({ unique: true })
   website: string;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
+  @Column({ default: false })
+  isApproved: boolean;
+
+  @Column({ nullable: true })
+  pendingCompanyName: string;
+
+  @Column({ nullable: true })
+  pendingWebsite: string;
+
+  @Column({ default: false })
+  hasPendingUpdate: boolean;
+
+  @Column({ nullable: true })
+  rejectionReason: string;
+
+  @OneToOne(() => User, (user) => user.supplier, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  user: User;
+
+  @OneToMany(() => RequestProduct, (requestProduct) => requestProduct.supplier)
+  requestProducts: RequestProduct[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => CURRENT_TIMESTAMP,
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => CURRENT_TIMESTAMP,
+  })
   updatedAt: Date;
 }

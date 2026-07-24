@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
-import { paymentMethod } from '../utils/enums';
+import { PaymentMethod } from '../utils/enums';
 import { JwtPayloadType, paymentMethods } from '../utils/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
@@ -110,7 +110,7 @@ export class OrderService {
         taxPrice,
         shippingPrice,
         orderPrice: cart.totalPriceAfterDiscount + taxPrice + shippingPrice,
-        paymentMethod: paymentMethodType as paymentMethod,
+        paymentMethod: paymentMethodType as PaymentMethod,
         shippingAddress,
         isPaid: false,
         isDelivered: false,
@@ -119,7 +119,7 @@ export class OrderService {
 
       const orderRepo = manager.getRepository(Order);
 
-      if (paymentMethodType === paymentMethod.CASH) {
+      if (paymentMethodType === PaymentMethod.CASH) {
         const order = orderRepo.create(orderData);
 
         if (orderData.orderPrice === 0) {
@@ -134,7 +134,7 @@ export class OrderService {
           message: 'Order created successfully',
           order,
         };
-      } else if (paymentMethodType === paymentMethod.CARD) {
+      } else if (paymentMethodType === PaymentMethod.CARD) {
         const { success_url, cancel_url } = linksAfterPayment;
 
         const order = orderRepo.create(orderData);
@@ -221,7 +221,7 @@ export class OrderService {
       });
     }
 
-    if (order.paymentMethod !== paymentMethod.CASH) {
+    if (order.paymentMethod !== PaymentMethod.CASH) {
       throw new BadRequestException({
         ok: false,
         message: 'Order payment method is not cash',

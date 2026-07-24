@@ -6,8 +6,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../user/entites/user.entity';
 import { CURRENT_TIMESTAMP } from '../../utils/constants';
+import { RequestProductStatus } from '../../utils/enums';
+import { Supplier } from '../../supplier/entities/supplier.entity';
 
 @Entity()
 export class RequestProduct {
@@ -26,8 +27,15 @@ export class RequestProduct {
   @Column({ default: null })
   category: string;
 
-  @ManyToOne(() => User, (user) => user.requestProducts)
-  user: User;
+  @ManyToOne(() => Supplier, (supplier) => supplier.requestProducts)
+  supplier: Supplier;
+
+  @Column({
+    type: 'enum',
+    enum: RequestProductStatus,
+    default: RequestProductStatus.PENDING,
+  })
+  status: RequestProductStatus;
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

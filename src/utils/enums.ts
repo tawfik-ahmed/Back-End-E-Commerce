@@ -1,6 +1,7 @@
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
+  SUPPLIER = 'supplier',
 }
 
 export enum UserGender {
@@ -8,7 +9,13 @@ export enum UserGender {
   FEMALE = 'female',
 }
 
-export enum paymentMethod {
+export enum PaymentMethod {
   CASH = 'cash',
   CARD = 'card',
+}
+
+export enum RequestProductStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
 }

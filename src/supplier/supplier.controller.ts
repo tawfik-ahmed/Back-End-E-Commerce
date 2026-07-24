@@ -1,57 +1,137 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   ParseIntPipe,
+  Patch,
   UseGuards,
 } from '@nestjs/common';
 import { SupplierService } from './supplier.service';
-import { CreateSupplierDto } from './dtos/create-supplier.dto';
 import { UpdateSupplierDto } from './dtos/update-supplier.dto';
+import { RejectSupplierDto } from './dtos/reject-supplier.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { Roles } from '../user/decorators/roles.decorator';
 import { UserRole } from '../utils/enums';
-import { AuthGuard } from '../auth/guards/auth.guard';
+import { CurrentUser } from '../user/decorators/current-user.decorator';
+import type { JwtPayloadType } from '../utils/types';
 
-// ~api/v1/suppliers
+// ~ api/v1/suppliers
 @Controller('suppliers')
 export class SupplierController {
   constructor(private readonly supplierService: SupplierService) {}
 
-  @Post()
+  /**
+   * Get all pending supplier requests.
+   */
+  @Get('pending')
   @Roles(UserRole.ADMIN)
   @UseGuards(AuthGuard)
-  public create(@Body() createSupplierDto: CreateSupplierDto) {
-    return this.supplierService.createSupplier(createSupplierDto);
+  public getPendingSuppliers() {
+    return this.supplierService.getPendingSuppliers();
   }
 
+  /**
+   * Get all pending supplier update requests.
+   */
+  @Get('pending-updates')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public getPendingUpdates() {
+    return this.supplierService.getPendingUpdates();
+  }
+
+  /**
+   * Get all approved suppliers.
+   */
   @Get()
-  public findAll() {
+  public getAllSuppliers() {
     return this.supplierService.getAllSuppliers();
   }
 
+  /**
+   * Get supplier by id.
+   */
   @Get(':id')
-  public findOne(@Param('id', ParseIntPipe) id: number) {
+  public getSupplier(@Param('id', ParseIntPipe) id: number) {
     return this.supplierService.getSupplier(id);
   }
-
-  @Patch(':id')
-  @Roles(UserRole.ADMIN)
+  /**
+   * Supplier requests profile update.
+   */
+  @Patch('me')
+  @Roles(UserRole.SUPPLIER)
   @UseGuards(AuthGuard)
-  public update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateSupplierDto: UpdateSupplierDto,
+  public updateMySupplier(
+    @CurrentUser() payload: JwtPayloadType,
+    @Body() dto: UpdateSupplierDto,
   ) {
-    return this.supplierService.updateSupplier(id, updateSupplierDto);
+    return this.supplierService.updateMySupplier(payload.id, dto);
   }
 
-  @Delete(':id')
+  /**
+   * Approve supplier registration.
+   */
+  @Patch(':id/approve')
   @Roles(UserRole.ADMIN)
   @UseGuards(AuthGuard)
-  public remove(@Param('id', ParseIntPipe) id: number) {
-    return this.supplierService.deleteSupplier(id);
+  public approveSupplier(@Param('id', ParseIntPipe) id: number) {
+    return this.supplierService.approveSupplier(id);
+  }
+
+  /**
+   * Reject supplier registration.
+   */
+  @Patch(':id/reject')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public rejectSupplier(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: RejectSupplierDto,
+  ) {
+    return this.supplierService.rejectSupplier(id, dto.reason);
+  }
+
+  /**
+   * Get supplier rejection reason.
+   */
+  @Get(':id/reject-reason')
+  @Roles(UserRole.ADMIN, UserRole.SUPPLIER)
+  @UseGuards(AuthGuard)
+  public getSupplierRejectionReason(@Param('id', ParseIntPipe) id: number, @CurrentUser() payload: JwtPayloadType) {
+    return this.supplierService.getSupplierRejectionReason(id, payload);
+  }
+
+  /**
+   * Approve supplier profile update.
+   */
+  @Patch(':id/approve-update')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public approveSupplierUpdate(@Param('id', ParseIntPipe) id: number) {
+    return this.supplierService.approveSupplierUpdate(id);
+  }
+
+  /**
+   * Reject supplier profile update.
+   */
+  @Patch(':id/reject-update')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public rejectSupplierUpdate(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: RejectSupplierDto,
+  ) {
+    return this.supplierService.rejectSupplierUpdate(id, dto.reason);
+  }
+
+  /**
+   * Get supplier profile update rejection reason.
+   */
+  @Get(':id/reject-update-reason')
+  @Roles(UserRole.ADMIN, UserRole.SUPPLIER)
+  @UseGuards(AuthGuard)
+  public getSupplierUpdateRejectionReason(@Param('id', ParseIntPipe) id: number, @CurrentUser() payload: JwtPayloadType) {
+    return this.supplierService.getSupplierUpdateRejectionReason(id, payload);
   }
 }

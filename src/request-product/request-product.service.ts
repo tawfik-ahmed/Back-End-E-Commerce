@@ -8,16 +8,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RequestProduct } from './entities/request-product.entity';
 import { Repository } from 'typeorm';
 import { CreateRequestProductDto } from './dtos/create-request-product.dto';
-import { UserService } from '../user/user.service';
-import { JwtPayloadType } from '../utils/types'; 
+import { JwtPayloadType } from '../utils/types';
 import { UpdateRequestProductDto } from './dtos/update-request-product.dto';
+import { SupplierService } from '../supplier/supplier.service';
+import { UserRole } from '../utils/enums';
+import { ProductService } from '../product/product.service';
 
 @Injectable()
 export class RequestProductService {
   constructor(
     @InjectRepository(RequestProduct)
     private readonly requestProductRepository: Repository<RequestProduct>,
-    private readonly userService: UserService,
+    private readonly supplierService: SupplierService,
+    private readonly productService: ProductService,
   ) {}
 
   /**
@@ -33,8 +36,15 @@ export class RequestProductService {
     dto: CreateRequestProductDto,
     userId: number,
   ): Promise<{ ok: boolean; message: string; data: RequestProduct }> {
+    const supplier = await this.supplierService.getSupplierByUserId(userId);
+
     const isExists = await this.requestProductRepository.exists({
-      where: { title: dto.title, user: { id: userId } },
+      where: {
+        title: dto.title,
+        supplier: {
+          id: supplier.id,
+        },
+      },
     });
 
     if (isExists) {
@@ -44,16 +54,16 @@ export class RequestProductService {
       });
     }
 
-    const user = await this.userService.getUserById(userId);
     const requestProduct = this.requestProductRepository.create({
       ...dto,
-      user,
+      supplier,
     });
+
     await this.requestProductRepository.save(requestProduct);
 
     return {
       ok: true,
-      message: 'Request product created successfully',
+      message: 'Request product created',
       data: requestProduct,
     };
   }
@@ -68,7 +78,11 @@ export class RequestProductService {
     data: RequestProduct[];
   }> {
     const requestProducts = await this.requestProductRepository.find({
-      relations: ['user'],
+      relations: {
+        supplier: {
+          user: true,
+        },
+      },
     });
     return { ok: true, data: requestProducts };
   }
@@ -87,9 +101,10 @@ export class RequestProductService {
     payload: JwtPayloadType,
   ): Promise<{ ok: boolean; data: RequestProduct }> {
     const requestProduct = await this.getRequestProductById(id);
-    const user = await this.userService.getUserById(requestProduct.user.id);
-
-    if (user.id !== payload.id && payload.role !== 'admin') {
+    if (
+      requestProduct.supplier.user.id !== payload.id &&
+      payload.role !== UserRole.ADMIN
+    ) {
       throw new BadRequestException({
         ok: false,
         message: 'You are not allowed to access this request product',
@@ -115,9 +130,10 @@ export class RequestProductService {
     payload: JwtPayloadType,
   ): Promise<{ ok: boolean; message: string; data: RequestProduct }> {
     const requestProduct = await this.getRequestProductById(id);
-    const user = await this.userService.getUserById(requestProduct.user.id);
-
-    if (user.id !== payload.id && payload.role !== 'admin') {
+    if (
+      requestProduct.supplier.user.id !== payload.id &&
+      payload.role !== UserRole.ADMIN
+    ) {
       throw new BadRequestException({
         ok: false,
         message: 'You are not allowed to access this request product',
@@ -151,9 +167,10 @@ export class RequestProductService {
     payload: JwtPayloadType,
   ): Promise<{ ok: boolean; message: string }> {
     const requestProduct = await this.getRequestProductById(id);
-    const user = await this.userService.getUserById(requestProduct.user.id);
-
-    if (user.id !== payload.id && payload.role !== 'admin') {
+    if (
+      requestProduct.supplier.user.id !== payload.id &&
+      payload.role !== UserRole.ADMIN
+    ) {
       throw new BadRequestException({
         ok: false,
         message: 'You are not allowed to access this request product',
@@ -178,7 +195,11 @@ export class RequestProductService {
   private async getRequestProductById(id: number): Promise<RequestProduct> {
     const requestProduct = await this.requestProductRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: {
+        supplier: {
+          user: true,
+        },
+      },
     });
 
     if (!requestProduct) {
@@ -189,5 +210,11 @@ export class RequestProductService {
     }
 
     return requestProduct;
+  }
+
+  public async acceptRequestProduct(id: number) {
+    const requestProduct = await this.getRequestProductById(id);
+    // TODO Create Product
+    return { ok: true, message: 'TODO Later', product: 'TODO Later' };
   }
 }

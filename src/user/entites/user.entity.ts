@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { CURRENT_TIMESTAMP } from '../../utils/constants'; 
+import { CURRENT_TIMESTAMP } from '../../utils/constants';
 import {
   Column,
   CreateDateColumn,
@@ -9,11 +9,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { RequestProduct } from '../../request-product/entities/request-product.entity'; 
 import { UserGender, UserRole } from '../../utils/enums';
-import { Review } from '../../review/entities/review.entity'; 
-import { Cart } from '../../cart/entities/cart.entity'; 
+import { Review } from '../../review/entities/review.entity';
+import { Cart } from '../../cart/entities/cart.entity';
 import { Order } from '../../order/entities/order.entity';
+import { Supplier } from '../../supplier/entities/supplier.entity';
 
 @Entity()
 export class User {
@@ -59,8 +59,8 @@ export class User {
   @Exclude()
   isCodeVerified: boolean;
 
-  @OneToMany(() => RequestProduct, (requestProduct) => requestProduct.user)
-  requestProducts: RequestProduct[];
+  @OneToOne(() => Supplier, (supplier) => supplier.user)
+  supplier: Supplier;
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
@@ -71,9 +71,15 @@ export class User {
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
 
-  @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => CURRENT_TIMESTAMP,
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => CURRENT_TIMESTAMP,
+  })
   updatedAt: Date;
 }

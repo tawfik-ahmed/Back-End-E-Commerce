@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entites/user.entity';
 import { CartItem } from '../../cart/entities/cart-item.entity';
-import { paymentMethod } from '../../utils/enums';
+import { PaymentMethod } from '../../utils/enums';
 
 class ShippingAddress {
   @Column({ nullable: true })
@@ -89,10 +89,10 @@ export class Order {
 
   @Column({
     type: 'enum',
-    enum: paymentMethod,
-    default: paymentMethod.CARD,
+    enum: PaymentMethod,
+    default: PaymentMethod.CARD,
   })
-  paymentMethod: paymentMethod;
+  paymentMethod: PaymentMethod;
 
   @Column({ default: false })
   isPaid: boolean;
