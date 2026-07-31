@@ -1,17 +1,52 @@
-import { IsNumber, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class CreateRequestProductDto {
   @IsString({ message: 'title must be a string' })
   title: string;
 
-  @MinLength(5, { message: 'details must be at least 5 characters long' })
-  @IsString({ message: 'details must be a string' })
-  details: string;
+  @MinLength(5, {
+    message: 'description must be at least 5 characters long',
+  })
+  @IsString({ message: 'description must be a string' })
+  description: string;
 
-  @IsNumber({}, { message: 'quantity must be a number' })
+  @IsString({ message: 'imageCover must be a string' })
+  @IsUrl({}, { message: 'imageCover must be a valid url' })
+  imageCover: string;
+
+  @IsNumber({}, { message: 'quantity must be an integer' })
+  @Min(1, { message: 'quantity must be at least 1' })
   quantity: number;
 
+  @IsNumber({}, { message: 'price must be a number' })
+  @Min(0, { message: 'price must be greater than or equal to 0' })
+  price: number;
+
   @IsOptional()
-  @IsString({ message: 'category must be a string' })
-  category: string;
+  @IsNumber({}, { message: 'discount must be a number' })
+  @Min(0, { message: 'discount must be greater than or equal to 0' })
+  discount?: number;
+
+  @IsNumber({}, { message: 'categoryId must be an integer' })
+  categoryId: number;
+
+  @IsNumber({}, { message: 'subCategoryId must be an integer' })
+  subCategoryId: number;
+
+  @IsNumber({}, { message: 'brandId must be an integer' })
+  brandId: number;
+
+  @IsOptional()
+  @IsArray({ message: 'colors must be an array' })
+  @IsNumber({}, { each: true, message: 'each color id must be an integer' })
+  colorIds?: number[];
 }

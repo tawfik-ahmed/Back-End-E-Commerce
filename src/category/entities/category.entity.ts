@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from '../../product/entities/product.entity'; 
+import { RequestProduct } from '../../request-product/entities/request-product.entity';
 
 @Entity()
 export class Category {
@@ -26,6 +27,9 @@ export class Category {
 
   @OneToMany(() => Product, (product) => product.category)
   products: Product[];
+
+  @OneToMany(() => RequestProduct, (requestProduct) => requestProduct.category)
+  requestProducts: RequestProduct[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

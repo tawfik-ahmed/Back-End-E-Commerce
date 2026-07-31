@@ -43,6 +43,27 @@ export class RequestProductController {
     return this.requestProductService.getAllRequestProducts();
   }
 
+  @Get('approved-request-products')
+  @Roles(UserRole.SUPPLIER)
+  @UseGuards(AuthGuard)
+  public getAcceptedRequestProducts(@CurrentUser() payload: JwtPayloadType) {
+    return this.requestProductService.getAllApprovedRequestProducts(payload.id);
+  }
+
+  @Get('pending-request-products')
+  @Roles(UserRole.SUPPLIER)
+  @UseGuards(AuthGuard)
+  public getPendingRequestProducts(@CurrentUser() payload: JwtPayloadType) {
+    return this.requestProductService.getAllPendingRequestProducts(payload.id);
+  }
+
+  @Get('rejected-request-products')
+  @Roles(UserRole.SUPPLIER)
+  @UseGuards(AuthGuard)
+  public getRejectedRequestProducts(@CurrentUser() payload: JwtPayloadType) {
+    return this.requestProductService.getAllRejectedRequestProducts(payload.id);
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.SUPPLIER)
   @UseGuards(AuthGuard)
@@ -78,10 +99,17 @@ export class RequestProductController {
     return this.requestProductService.deleteRequestProduct(id, payload);
   }
 
-  @Post(':id/accept')
+  @Post('accept/:id')
   @Roles(UserRole.ADMIN)
   @UseGuards(AuthGuard)
   public acceptRequestProduct(@Param('id', ParseIntPipe) id: number) {
     return this.requestProductService.acceptRequestProduct(id);
+  }
+
+  @Post('reject/:id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
+  public rejectRequestProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.requestProductService.rejectRequestProduct(id);
   }
 }

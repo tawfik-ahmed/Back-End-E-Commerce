@@ -531,11 +531,11 @@ export class ProductService {
    *
    * @returns {Promise<[Category, SubCategory, Brand]>} - Array with category, subcategory and brand entities.
    */
-  private async getCategorySubCategoryBrandEntities(
+  public async getCategorySubCategoryBrandEntities(
     categoryId: number,
     subCategoryId: number,
     brandId: number,
-    manager: EntityManager,
+    manager?: EntityManager,
   ): Promise<[Category, SubCategory, Brand]> {
     const [category, subCategory, brand] = await Promise.all([
       this.categoryService.getCategoryById(categoryId, manager),

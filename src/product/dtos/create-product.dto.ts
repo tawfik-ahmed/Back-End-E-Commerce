@@ -30,11 +30,11 @@ export class CreateProductDto {
   @IsArray({ message: 'images must be an array' })
   @IsUrl({}, { message: 'images must be an array of valid urls', each: true })
   @IsOptional()
-  images: Array<string>;
+  images?: Array<string>;
 
   @IsNumber({}, { message: 'sold must be a number' })
   @IsOptional()
-  sold: number;
+  sold?: number;
 
   @IsNumber({}, { message: 'price must be a number' })
   @Min(1, { message: 'price must be at least 1' })
@@ -42,12 +42,13 @@ export class CreateProductDto {
 
   @IsNumber({}, { message: 'price after discount must be a number' })
   @Min(1, { message: 'price must be at least 1' })
-  discount: number;
+  @IsOptional()
+  discount?: number;
 
   @IsArray({ message: 'colors must be an array' })
   @IsString({ each: true, message: 'each color must be a string' })
   @IsOptional()
-  colors: Array<string>;
+  colors?: Array<string>;
 
   @IsNumber({}, { message: 'category Id must be a number' })
   categoryId: number;

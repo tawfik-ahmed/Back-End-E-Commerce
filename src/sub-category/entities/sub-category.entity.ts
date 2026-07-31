@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Category } from '../../category/entities/category.entity';
 import { Product } from '../../product/entities/product.entity'; 
+import { RequestProduct } from '../../request-product/entities/request-product.entity';
 
 @Entity()
 export class SubCategory {
@@ -25,6 +26,9 @@ export class SubCategory {
   @ManyToOne(() => Category, (category) => category.subCategories)
   category: Category;
 
+  @OneToMany(() => RequestProduct, (requestProduct) => requestProduct.subCategory)
+  requestProducts: RequestProduct[];
+  
   @OneToMany(() => Product, (product) => product.subCategory)
   products: Product[];
 

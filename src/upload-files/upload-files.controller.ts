@@ -80,9 +80,24 @@ export class UploadFilesController {
   }
 
   @Delete('product-images')
-  @UseGuards(AuthGuard)
   @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard)
   public deleteProductImages(@Body('publicIds') publicIds: string[]) {
     return this.uploadFilesService.deleteProductImages(publicIds);
+  }
+
+  @Post('request-product-cover-image')
+  @UseInterceptors(FileInterceptor('file'))
+  @Roles(UserRole.ADMIN, UserRole.SUPPLIER)
+  @UseGuards(AuthGuard)
+  public uploadRequestProductCoverImage(
+    @UploadedFile(createImageUploadPipe(5 * 1024 * 1024))
+    file: Express.Multer.File,
+    @Body('productName') productName: string,
+  ) {
+    return this.uploadFilesService.uploadRequestProductCoverImage(
+      file,
+      productName,
+    );
   }
 }

@@ -1,4 +1,5 @@
-import { Product } from '../../product/entities/product.entity'; 
+import { Product } from '../../product/entities/product.entity';
+import { RequestProduct } from '../../request-product/entities/request-product.entity';
 import { CURRENT_TIMESTAMP } from '../../utils/constants';
 import {
   Column,
@@ -22,6 +23,9 @@ export class Brand {
 
   @OneToMany(() => Product, (product) => product.brand)
   products: Product[];
+
+  @OneToMany(() => RequestProduct, (requestProduct) => requestProduct.brand)
+  requestProducts: RequestProduct[];
 
   @CreateDateColumn({ type: 'timestamp', default: () => CURRENT_TIMESTAMP })
   createdAt: Date;

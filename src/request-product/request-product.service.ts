@@ -11,7 +11,7 @@ import { CreateRequestProductDto } from './dtos/create-request-product.dto';
 import { JwtPayloadType } from '../utils/types';
 import { UpdateRequestProductDto } from './dtos/update-request-product.dto';
 import { SupplierService } from '../supplier/supplier.service';
-import { UserRole } from '../utils/enums';
+import { RequestProductStatus, UserRole } from '../utils/enums';
 import { ProductService } from '../product/product.service';
 
 @Injectable()
@@ -54,9 +54,21 @@ export class RequestProductService {
       });
     }
 
+    const [category, subCategory, brand] =
+      await this.productService.getCategorySubCategoryBrandEntities(
+        dto.categoryId,
+        dto.subCategoryId,
+        dto.brandId,
+      );
+
+    const { categoryId, subCategoryId, brandId, ...rest } = dto;
     const requestProduct = this.requestProductRepository.create({
-      ...dto,
+      ...rest,
       supplier,
+      brand,
+      category,
+      subCategory,
+      status: RequestProductStatus.PENDING,
     });
 
     await this.requestProductRepository.save(requestProduct);
@@ -85,6 +97,81 @@ export class RequestProductService {
       },
     });
     return { ok: true, data: requestProducts };
+  }
+
+  /**
+   * Retrieves all pending request products.
+   *
+   * @returns {Promise<RequestProduct[]>} - Array of request product data.
+   */
+  public async getAllPendingRequestProducts(id: number) {
+    const supplier = await this.supplierService.getSupplierByUserId(id);
+    const requestProducts = await this.requestProductRepository.find({
+      where: {
+        supplier: { id: supplier.id },
+        status: RequestProductStatus.PENDING,
+      },
+      relations: {
+        supplier: true,
+        category: true,
+        subCategory: true,
+        brand: true,
+        colors: true,
+      },
+    });
+
+    return { ok: true, requestProducts };
+  }
+
+  /**
+   * Retrieves all approved request products.
+   *
+   * @returns {Promise<RequestProduct[]>} - Array of request product data.
+   */
+  public async getAllApprovedRequestProducts(id: number) {
+    const supplier = await this.supplierService.getSupplierByUserId(id);
+    const requestProducts = await this.requestProductRepository.find({
+      where: {
+        supplier: { id: supplier.id },
+        status: RequestProductStatus.APPROVED,
+      },
+      relations: {
+        supplier: true,
+        category: true,
+        subCategory: true,
+        brand: true,
+        colors: true,
+      },
+    });
+
+    return { ok: true, requestProducts };
+  }
+
+  /**
+   * Retrieves all rejected request products.
+   *
+   * @returns {Promise<RequestProduct[]>} - Array of request product data.
+   */
+  public async getAllRejectedRequestProducts(id: number) {
+    const requestProducts = await this.requestProductRepository.find({
+      where: {
+        supplier: {
+          user: {
+            id,
+          },
+        },
+        status: RequestProductStatus.REJECTED,
+      },
+      relations: {
+        supplier: true,
+        category: true,
+        subCategory: true,
+        brand: true,
+        colors: true,
+      },
+    });
+
+    return { ok: true, requestProducts };
   }
 
   /**
@@ -130,6 +217,13 @@ export class RequestProductService {
     payload: JwtPayloadType,
   ): Promise<{ ok: boolean; message: string; data: RequestProduct }> {
     const requestProduct = await this.getRequestProductById(id);
+
+    if (requestProduct.status !== RequestProductStatus.PENDING) {
+      throw new BadRequestException({
+        ok: false,
+        message: 'You are not allowed to update this request product',
+      });
+    }
     if (
       requestProduct.supplier.user.id !== payload.id &&
       payload.role !== UserRole.ADMIN
@@ -199,6 +293,10 @@ export class RequestProductService {
         supplier: {
           user: true,
         },
+        category: true,
+        subCategory: true,
+        brand: true,
+        colors: true,
       },
     });
 
@@ -212,9 +310,51 @@ export class RequestProductService {
     return requestProduct;
   }
 
-  public async acceptRequestProduct(id: number) {
-    const requestProduct = await this.getRequestProductById(id);
-    // TODO Create Product
-    return { ok: true, message: 'TODO Later', product: 'TODO Later' };
+  /**
+   * Accepts a request product by id.
+   *
+   * @throws {NotFoundException} If request product does not exist.
+   *
+   * @param {number} id - Request product id.
+   * @returns {Promise<{ ok: boolean; message: string; product: Product }>} - Object with ok property, success message and product data.
+   */
+  public async acceptRequestProduct(requestProductId: number) {
+    const requestProduct = await this.getRequestProductById(requestProductId);
+
+    if (requestProduct.status !== RequestProductStatus.PENDING) {
+      throw new BadRequestException({
+        ok: false,
+        message: 'You are not allowed to accept this request product',
+      });
+    }
+    const obj = {
+      title: requestProduct.title,
+      description: requestProduct.description,
+      quantity: requestProduct.quantity,
+      price: requestProduct.price,
+      imageCover: requestProduct.imageCover,
+      brandId: requestProduct.brand.id,
+      categoryId: requestProduct.category.id,
+      subCategoryId: requestProduct.subCategory.id,
+    };
+    const product = await this.productService.createProduct(obj);
+    requestProduct.status = RequestProductStatus.APPROVED;
+    await this.requestProductRepository.save(requestProduct);
+    return { ok: true, message: 'Request product accepted', product: product };
+  }
+
+  /**
+   * Rejects a request product by id.
+   *
+   * @throws {NotFoundException} If request product does not exist.
+   *
+   * @param {number} id - Request product id.
+   * @returns {Promise<{ ok: boolean; message: string }>} - Object with ok property and success message.
+   */
+  public async rejectRequestProduct(requestProductId: number) {
+    const requestProduct = await this.getRequestProductById(requestProductId);
+    requestProduct.status = RequestProductStatus.REJECTED;
+    await this.requestProductRepository.save(requestProduct);
+    return { ok: true, message: 'Request product rejected' };
   }
 }

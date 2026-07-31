@@ -84,6 +84,14 @@ export class UploadFilesService {
     return this.uploadFile(file, 'Product-Covers', productName);
   }
 
+  public async uploadRequestProductCoverImage(
+    file: Express.Multer.File,
+    productName: string,
+  ) {
+    await this.deleteFile('Request-Product-Covers', productName);
+    return this.uploadFile(file, 'Request-Product-Covers', productName);
+  }
+
   /**
    * Uploads multiple product images to Cloudinary
    * @param {Multer.File[]} files
