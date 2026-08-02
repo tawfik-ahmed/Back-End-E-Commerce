@@ -129,7 +129,7 @@ export class AuthService {
     await this.userRepository.save(user);
 
     await this.mailerService.sendMail({
-      from: `Back-End E-Commerce NestJS <${this.config.get<string>('SMTP_USER')}>`,
+      from: `Back-End E-Commerce NestJS <${this.config.get<string>('GMAIL_USER')}>`,
       to: email,
       subject: 'Back-End E-Commerce NestJS - Reset Password',
       html: `<div>

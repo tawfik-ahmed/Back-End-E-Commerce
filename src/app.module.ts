@@ -49,8 +49,8 @@ import { OAuthModule } from './oauth/oauth.module';
         transport: {
           service: 'gmail',
           auth: {
-            user: config.get<string>('SMTP_USER'),
-            pass: config.get<string>('SMTP_PASSWORD'),
+            user: config.get<string>('GMAIL_USER'),
+            pass: config.get<string>('GMAIL_APP_PASSWORD'),
           },
         },
       }),

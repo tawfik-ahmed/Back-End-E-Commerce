@@ -1,11 +1,14 @@
 import { IsDateString, IsNumber, IsString, Length, Min } from 'class-validator';
 import { IsFutureDate } from '../decorators/validate-date.decorator';
+import { Transform } from 'class-transformer';
+import { normalizeText } from '../../utils/normalize';
 
 export class CreateCouponDto {
   @IsString({ message: 'Name must be a string' })
   @Length(3, 100, {
     message: 'Name must be at least 3 characters long and no more than 100',
   })
+  @Transform(({ value }) => normalizeText(value))
   name: string;
 
   @IsDateString({}, { message: 'Expire date must be a valid date string' })

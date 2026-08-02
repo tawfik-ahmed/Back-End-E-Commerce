@@ -1,10 +1,13 @@
+import { Transform } from 'class-transformer';
 import { IsNumber, IsOptional, IsString, IsUrl, Length } from 'class-validator';
+import { normalizeText } from '../../utils/normalize';
 
 export class CreateSubCategoryDto {
   @IsString({ message: 'Name must be a string' })
   @Length(3, 50, {
     message: 'Name must be at least 3 characters long and no more than 50',
   })
+  @Transform(({ value }) => normalizeText(value))
   name: string;
 
   @IsString({ message: 'Image must be a string' })

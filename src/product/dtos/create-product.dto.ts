@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsNumber,
@@ -8,12 +9,14 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { normalizeText } from '../../utils/normalize';
 
 export class CreateProductDto {
   @IsString({ message: 'title must be a string' })
   @Length(3, 150, {
     message: 'title must be at least 3 characters long and no more than 150',
   })
+  @Transform(({ value }) => normalizeText(value))
   title: string;
 
   @IsString({ message: 'description must be a string' })

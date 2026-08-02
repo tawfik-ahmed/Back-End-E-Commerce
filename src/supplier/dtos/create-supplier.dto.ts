@@ -1,4 +1,6 @@
+import { Transform } from 'class-transformer';
 import { IsString, IsUrl, Length } from 'class-validator';
+import { normalizeText } from '../../utils/normalize';
 
 export class CreateSupplierDto {
   @IsString()
@@ -6,6 +8,7 @@ export class CreateSupplierDto {
     message:
       'Company name must be at least 3 characters long and no more than 100 characters',
   })
+  @Transform(({ value }) => normalizeText(value))
   companyName: string;
 
   @IsString()

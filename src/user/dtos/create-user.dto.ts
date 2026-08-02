@@ -13,16 +13,20 @@ import {
   Min,
 } from 'class-validator';
 import { UserGender, UserRole } from '../../utils/enums'; 
+import { normalizeText } from '../../utils/normalize';
+import { Transform } from 'class-transformer';
 
 export class CreateUserDto {
   @IsString()
   @Length(3, 35, {
     message: 'Name must be at least 3 characters long and no more than 35',
   })
+  @Transform(({ value }) => normalizeText(value))
   name: string;
 
   @IsEmail({}, { message: 'Incorrect email' })
   @MaxLength(50, { message: 'Email must be no more than 50 characters' })
+  @Transform(({ value }) => normalizeText(value))
   email: string;
 
   @IsString()
@@ -54,6 +58,7 @@ export class CreateUserDto {
   @IsString()
   @MaxLength(100, { message: 'Address must be no more than 100 characters' })
   @IsOptional()
+  @Transform(({ value }) => normalizeText(value))
   address?: string;
 
   @IsEnum(UserGender, { message: 'Incorrect gender' })

@@ -1,0 +1,3425 @@
+{
+  "info": {
+    "_postman_id": "a1e2820c-92e3-44b4-b759-f05f7c2890cc",
+    "name": "Back-End E-Commerce",
+    "description": "# Back-End E-Commerce API\n\nA comprehensive, production-ready **REST API** powering a full-featured e-commerce backend. This API covers the entire commerce lifecycle — from user authentication and product catalog management, to shopping carts, order processing, and file uploads. Built with a modular, resource-oriented architecture, it is designed to serve both end-users and administrators through clearly separated concerns.\n\n---\n\n## Base URL\n\nAll API endpoints are prefixed with `/api/v1` and resolved against the `{{base_url}}` environment variable.\n\n```\n{{base_url}}/api/v1\n\n ```\n\n> Set the `base_url` variable in your active Postman environment before sending requests. \n  \n\n---\n\n## Authentication\n\nMost endpoints require a valid **Bearer JWT token** passed in the `Authorization` header.\n\n```\nAuthorization: Bearer <your_token>\n\n ```\n\nObtain a token by calling the **Auth → Sign In** endpoint with valid credentials. The returned token should be stored (e.g., in the `token` environment variable) and reused across subsequent requests.\n\n---\n\n## API Modules\n\n| Folder | Description |\n| --- | --- |\n| **Auth** | User registration, login, password reset, and token management |\n| **Users** | Authenticated user self-service profile management |\n| **Users As Admins** | Admin-level user management with filtering and pagination |\n| **Categories** | Top-level product category CRUD |\n| **Sub Categories** | Nested sub-categories linked to parent categories |\n| **Brands** | Product brand management |\n| **Coupons** | Discount coupon creation and management |\n| **Suppliers** | Supplier/vendor management |\n| **Request Products** | Internal procurement and restocking requests |\n| **Taxes** | Global tax and shipping price configuration |\n| **Products** | Core product catalog management |\n| **Reviews** | Customer product reviews and ratings |\n| **Carts** | Shopping cart management and coupon application |\n| **Orders** | Order checkout (cash & card) and order history |\n| **Upload-Images** | File upload for profile images and product media |\n\n---\n\n## Quick Start\n\nFollow this typical flow to interact with the API end-to-end:\n\n**1\\. Register or Sign In**\n\n```\nPOST {{base_url}}/api/v1/auth/signup\nPOST {{base_url}}/api/v1/auth/signin\n\n ```\n\nA successful sign-in returns a JWT token. Store it as your `token` variable.\n\n**2\\. Authenticate Requests**\n\nInclude the token in the `Authorization` header for all protected endpoints:\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\n**3\\. Browse the Product Catalog**\n\n```\nGET {{base_url}}/api/v1/products\nGET {{base_url}}/api/v1/categories\nGET {{base_url}}/api/v1/sub-categories\n\n ```\n\n**4\\. Add Items to Cart**\n\n```\nPOST {{base_url}}/api/v1/carts\n\n ```\n\nOptionally apply a discount coupon:\n\n```\nPUT {{base_url}}/api/v1/carts/apply-coupon\n\n ```\n\n**5\\. Place an Order**\n\n```\nPOST {{base_url}}/api/v1/orders          // Cash on delivery\nPOST {{base_url}}/api/v1/orders/checkout // Card payment\n\n ```\n\n---\n\n> For any issues with authentication or permissions, ensure your token is valid and not expired. Re-authenticate via the Sign In endpoint to obtain a fresh token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "47398342",
+    "_collection_link": "https://go.postman.co/collection/47398342-a1e2820c-92e3-44b4-b759-f05f7c2890cc?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Users As Admins",
+      "item": [
+        {
+          "name": "Get All Users",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfikahmed1x@gmail.com\",\r\n    \"password\": \"tawfik01226921531\",\r\n    \"name\": \"Tawfik Ahmed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users?role=admin&limit=5&skip=0&sort=age",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "admin"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "sort",
+                  "value": "age"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfikahmed1x@gmail.com\",\r\n    \"password\": \"tawfik01226921531\",\r\n    \"name\": \"Tawfik Ahmed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/7",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "7"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"taw@gmail.com\",\r\n    \"password\": \"#tawfikahmed01226921531#\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"password\": \"tawfik01226921531\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/9",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/11",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "11"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Users As Admins\n\nThis folder covers the administrative user management endpoints, accessible only to users with an admin role. It provides full CRUD capabilities over all user accounts in the system, along with filtering, sorting, and pagination support. These endpoints are intended for back-office operations and user oversight.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/users` | Retrieve a paginated, filtered, and sorted list of all users. Supports query params: `role`, `limit`, `skip`, `sort`. |\n| `GET` | `/api/v1/users/:id` | Retrieve the full profile of a specific user by their ID. |\n| `POST` | `/api/v1/users` | Create a new user account as an admin. |\n| `PATCH` | `/api/v1/users/:id` | Update the profile or role of a specific user by their ID. |\n| `DELETE` | `/api/v1/users/:id` | Permanently delete a specific user account by their ID. |\n\n### Example Requests\n\n**Create New User** — `POST {{base_url}}/api/v1/users`\n\n``` json\n{\n  \"name\": \"Jane Smith\",                        // required, 3–35 chars\n  \"email\": \"jane@example.com\",                 // required, max 50 chars\n  \"password\": \"pass1234\",                      // required, 6–40 chars\n  \"role\": \"user\",                              // optional, enum: user | admin\n  \"age\": 28,                                   // optional, 10–100\n  \"avatar\": \"https://example.com/avatar.jpg\",  // optional, valid URL\n  \"phoneNumber\": \"+201012345678\",              // optional, Egyptian phone\n  \"address\": \"456 Nile St, Giza\",              // optional, max 100 chars\n  \"gender\": \"female\",                          // optional, enum: male | female\n  \"isActive\": true,                            // optional, boolean\n  \"verificationCode\": \"abc123\"                 // optional\n}\n\n ```\n\n**Update User** — `PATCH {{base_url}}/api/v1/users/:id`\n\n``` json\n{\n  \"name\": \"Jane Smith\",                        // optional, 3–35 chars\n  \"email\": \"jane@example.com\",                 // optional, max 50 chars\n  \"password\": \"newpass456\",                    // optional, 6–40 chars\n  \"role\": \"admin\",                             // optional, enum: user | admin\n  \"age\": 30,                                   // optional, 10–100\n  \"avatar\": \"https://example.com/avatar.jpg\",  // optional, valid URL\n  \"phoneNumber\": \"+201012345678\",              // optional, Egyptian phone\n  \"address\": \"789 Pyramid Rd, Cairo\",          // optional, max 100 chars\n  \"gender\": \"male\",                            // optional, enum: male | female\n  \"isActive\": false,                           // optional, boolean\n  \"verificationCode\": \"xyz789\"                 // optional\n}\n\n ```"
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User (Me)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfikahmed1x@gmail.com\",\r\n    \"password\": \"tawfik01226921531\",\r\n    \"name\": \"Tawfik Ahmed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users-me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users-me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User (Me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Tawfik Ahmed Tawfik\",\r\n    \"role\": \"supplier\",\r\n    \"companyName\": \"App Now\",\r\n    \"website\": \"https://www.facebook.com/tawfik.ahmed.132749\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users-me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users-me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User (Me)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users-me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users-me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Users\n\nThis folder covers the self-service user profile endpoints available to authenticated users. It allows a logged-in user to retrieve, update, or permanently delete their own account. All requests in this folder operate on the currently authenticated user's context (`/users-me`) and require a valid access token.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/users-me` | Retrieve the profile information of the currently authenticated user. |\n| `PATCH` | `/api/v1/users-me` | Update profile fields (e.g., name, email) for the currently authenticated user. |\n| `DELETE` | `/api/v1/users-me` | Permanently delete the currently authenticated user's account. |\n\n### Example Requests\n\n**Update User (Me)** — `PATCH {{base_url}}/api/v1/users-me`\n\n``` json\n{\n  \"name\": \"John Doe\",                          // optional, 3–35 chars\n  \"email\": \"john@example.com\",                 // optional, max 50 chars\n  \"age\": 25,                                   // optional, 10–100\n  \"avatar\": \"https://example.com/avatar.jpg\",  // optional, valid URL\n  \"phoneNumber\": \"+201012345678\",              // optional, Egyptian phone\n  \"address\": \"123 Main St, Cairo\",             // optional, max 100 chars\n  \"gender\": \"male\"                             // optional, enum: male | female\n}\n\n ```"
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfikahgfdmed@gmail.com\",\r\n    \"password\": \"#tawfikahmed01226921531#\",\r\n    \"name\": \"Tifo     dfds  \"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/sign-up",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "sign-up"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tavvfikk@gmail.com\",\r\n    \"password\": \"#tawfikahmed01226921531#\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/sign-in",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "sign-in"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tavvfikk@gmail.com\" \r\n}   ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Code",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tavvfikk@gmail.com\",\r\n    \"verificationCode\": \"490175\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/verify-code",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "verify-code"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Access Token",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/refresh-token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh-token"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Auth\n\nThis folder covers all authentication-related operations for the e-commerce platform. It handles user registration, login, password management, and token lifecycle. These endpoints are the entry point for any user interaction with the system and are required before accessing protected resources.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/v1/auth/sign-up` | Register a new user account with the required credentials. |\n| `POST` | `/api/v1/auth/sign-in` | Authenticate an existing user and receive access and refresh tokens. |\n| `POST` | `/api/v1/auth/reset-password` | Initiate a password reset flow by sending a verification code to the user's email. |\n| `POST` | `/api/v1/auth/verify-code` | Verify the code sent during the password reset flow. |\n| `POST` | `/api/v1/auth/change-password` | Set a new password after successful code verification. |\n| `POST` | `/api/v1/auth/refresh-token` | Exchange a valid refresh token for a new access token. |\n\n### Example Requests\n\n**Sign Up** — `POST {{base_url}}/api/v1/auth/sign-up`\n\n``` json\n{\n  \"name\": \"John Doe\",          // required, 3–35 chars\n  \"email\": \"john@example.com\", // required, max 50 chars\n  \"password\": \"secret123\"      // required, 6–40 chars\n}\n\n ```\n\n**Sign In** — `POST {{base_url}}/api/v1/auth/sign-in`\n\n``` json\n{\n  \"email\": \"john@example.com\", // required, max 50 chars\n  \"password\": \"secret123\"      // required, 6–40 chars\n}\n\n ```\n\n**Reset Password** — `POST {{base_url}}/api/v1/auth/reset-password`\n\n``` json\n{\n  \"email\": \"john@example.com\" // required\n}\n\n ```\n\n**Verify Code** — `POST {{base_url}}/api/v1/auth/verify-code`\n\n``` json\n{\n  \"code\": \"123456\" // required\n}\n\n ```\n\n**Change Password** — `POST {{base_url}}/api/v1/auth/change-password`\n\n``` json\n{\n  \"oldPassword\": \"secret123\",  // required\n  \"newPassword\": \"newpass456\"  // required\n}\n\n ```\n\n**Refresh Access Token** — `POST {{base_url}}/api/v1/auth/refresh-token`\n\n``` json\n{\n  \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\" // required\n}\n\n ```"
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Phones\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Categories\n\nThis folder covers the top-level product category management endpoints. Categories are the primary classification layer for organizing products in the e-commerce catalog. Admin users can create, update, and delete categories, while all users can browse them.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/categories` | Retrieve a list of all available product categories. |\n| `GET` | `/api/v1/categories/:id` | Retrieve the details of a specific category by its ID. |\n| `POST` | `/api/v1/categories` | Create a new product category (admin only). |\n| `PATCH` | `/api/v1/categories/:id` | Update the name or details of an existing category (admin only). |\n| `DELETE` | `/api/v1/categories/:id` | Delete a category by its ID (admin only). |\n\n### Example Requests\n\n**Create New Category** — `POST {{base_url}}/api/v1/categories`\n\n``` json\n{\n  \"name\": \"Electronics\",                              // required, 3–50 chars\n  \"image\": \"https://example.com/electronics.jpg\"     // optional, valid URL\n}\n\n ```\n\n**Update Category** — `PATCH {{base_url}}/api/v1/categories/:id`\n\n``` json\n{\n  \"name\": \"Electronics\",                              // optional, 3–50 chars\n  \"image\": \"https://example.com/electronics.jpg\"     // optional, valid URL\n}\n\n ```"
+    },
+    {
+      "name": "Sub Categories",
+      "item": [
+        {
+          "name": "Get All Sub Categories",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sub-categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sub-categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sub Category",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/sub-categories/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sub-categories",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sub Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n\r\n  { \"name\": \"Samsung\", \"image\": \"https://example.com/images/hoodies.jpg\", \"categoryId\": 1 }\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sub-categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sub-categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Sub Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Mac\",\r\n    \"categoryId\": 2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sub-categories/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sub-categories",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Sub Category",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/sub-categories/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sub-categories",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Sub Categories\n\nThis folder covers sub-category management endpoints. Sub-categories provide a second level of product classification, nested under top-level categories, enabling more granular product organization within the catalog. Admin users can manage sub-categories, while all users can browse them.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/sub-categories` | Retrieve a list of all sub-categories. |\n| `GET` | `/api/v1/sub-categories/:id` | Retrieve the details of a specific sub-category by its ID. |\n| `POST` | `/api/v1/sub-categories` | Create a new sub-category and associate it with a parent category (admin only). |\n| `PATCH` | `/api/v1/sub-categories/:id` | Update the name or parent category of an existing sub-category (admin only). |\n| `DELETE` | `/api/v1/sub-categories/:id` | Delete a sub-category by its ID (admin only). |\n\n### Example Requests\n\n**Create Sub Category** — `POST {{base_url}}/api/v1/sub-categories`\n\n``` json\n{\n  \"name\": \"Smartphones\",                           // required, 3–50 chars\n  \"categoryId\": 1,                                 // required, number\n  \"image\": \"https://example.com/smartphones.jpg\"  // optional, valid URL\n}\n\n ```\n\n**Update Sub Category** — `PATCH {{base_url}}/api/v1/sub-categories/:id`\n\n``` json\n{\n  \"name\": \"Smartphones\",                           // optional, 3–50 chars\n  \"categoryId\": 1,                                 // optional, number\n  \"image\": \"https://example.com/smartphones.jpg\"  // optional, valid URL\n}\n\n ```"
+    },
+    {
+      "name": "Brands",
+      "item": [
+        {
+          "name": "Get All Brands",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/brands",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "brands"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Brand",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/brands/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "brands",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Brand",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Samsung\", \r\n  \"image\": \"https://example.com/images/hm.jpg\" \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/brands",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "brands"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Brand",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"apple\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/brands/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "brands",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Brand",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/brands/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "brands",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Brands\n\nThis folder covers brand management endpoints for the e-commerce platform. Brands represent the manufacturers or labels associated with products, allowing customers to filter and discover products by brand. Admin users can create, update, and delete brands, while all users can browse them.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/brands` | Retrieve a list of all available brands. |\n| `GET` | `/api/v1/brands/:id` | Retrieve the details of a specific brand by its ID. |\n| `POST` | `/api/v1/brands` | Create a new brand (admin only). |\n| `PATCH` | `/api/v1/brands/:id` | Update the name or details of an existing brand (admin only). |\n| `DELETE` | `/api/v1/brands/:id` | Delete a brand by its ID (admin only). |\n\n### Example Requests\n\n**Create New Brand** — `POST {{base_url}}/api/v1/brands`\n\n``` json\n{\n  \"name\": \"Samsung\",                              // required, 3–100 chars\n  \"image\": \"https://example.com/samsung.jpg\"     // required, valid URL\n}\n\n ```\n\n**Update Brand** — `PATCH {{base_url}}/api/v1/brands/:id`\n\n``` json\n{\n  \"name\": \"Samsung\",                              // optional, 3–100 chars\n  \"image\": \"https://example.com/samsung.jpg\"     // optional, valid URL\n}\n\n ```"
+    },
+    {
+      "name": "Coupons",
+      "item": [
+        {
+          "name": "Get All Coupons",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/coupons",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "coupons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Coupon",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/coupons/12",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "coupons",
+                "12"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create New Coupon",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Coupon1\",\r\n    \"expireDate\": \"2026-06-19\",\r\n    \"discount\": 2\r\n}   ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/coupons",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "coupons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Coupon",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Coupon1\",\r\n    \"expireDate\": \"2026-03-20\",\r\n    \"discount\": 2\r\n}   ",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/coupons/12",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "coupons",
+                "12"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Coupon",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/coupons/12",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "coupons",
+                "12"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Coupons\n\nThis folder covers discount coupon management endpoints. Coupons allow the platform to offer promotional discounts to customers. Admin users can create, update, and delete coupons, while customers can apply them to their carts during checkout.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/coupons` | Retrieve a list of all available coupons. |\n| `GET` | `/api/v1/coupons/:id` | Retrieve the details of a specific coupon by its ID. |\n| `POST` | `/api/v1/coupons` | Create a new discount coupon (admin only). |\n| `PATCH` | `/api/v1/coupons/:id` | Update the value, expiry, or conditions of an existing coupon (admin only). |\n| `DELETE` | `/api/v1/coupons/:id` | Delete a coupon by its ID (admin only). |\n\n### Example Requests\n\n**Create New Coupon** — `POST {{base_url}}/api/v1/coupons`\n\n``` json\n{\n  \"name\": \"SUMMER20\",                // required, 3–100 chars\n  \"expireDate\": \"2026-12-31\",        // required, future ISO date string\n  \"discount\": 20                     // required, number >= 0\n}\n\n ```\n\n**Update Coupon** — `PATCH {{base_url}}/api/v1/coupons/:id`\n\n``` json\n{\n  \"name\": \"SUMMER20\",                // optional, 3–100 chars\n  \"expireDate\": \"2026-12-31\",        // optional, future ISO date string\n  \"discount\": 20                     // optional, number >= 0\n}\n\n ```"
+    },
+    {
+      "name": "Suppliers",
+      "item": [
+        {
+          "name": "Get All Suppliers",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Supplier",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pending Suppliers Requests",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/pending",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "pending"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pending Suppliers Update Requests",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/pending-updates",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "pending-updates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Supplier Registration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"companyName\": \"Tito\",\r\n    \"website\": \"https://facebook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/1/approve",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "1",
+                "approve"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Supplier Registration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"companyName\": \"Tito\",\r\n    \"website\": \"https://facebook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/1/reject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "1",
+                "reject"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Supplier Rejection Reason",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/1/reject-reason",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "1",
+                "reject-reason"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Supplier Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"companyName\": \"Tito\",\r\n    \"website\": \"https://facebook.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Supplier Updates",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/1/approve-update",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "1",
+                "approve-update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Supplier Updates",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/1/reject-update",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "1",
+                "reject-update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Supplier Reject Updates Reason",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/suppliers/1/reject-update-reason",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "suppliers",
+                "1",
+                "reject-update-reason"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Suppliers\n\nThis folder covers all supplier management endpoints for the e-commerce platform. Suppliers represent the vendors or distributors who provide products to the platform. These endpoints handle the full supplier lifecycle — from registration and approval to profile updates and rejection handling. Most admin-level endpoints require elevated privileges.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/suppliers` | Retrieve a list of all registered suppliers. |\n| `GET` | `/api/v1/suppliers/:id` | Retrieve the details of a specific supplier by their ID. |\n| `GET` | `/api/v1/suppliers/pending` | Retrieve all suppliers whose registration is awaiting admin approval. |\n| `GET` | `/api/v1/suppliers/pending-updates` | Retrieve all suppliers who have submitted profile update requests pending admin review. |\n| `PATCH` | `/api/v1/suppliers/:id/approve` | Approve a supplier's registration request (admin only). |\n| `PATCH` | `/api/v1/suppliers/:id/reject` | Reject a supplier's registration request (admin only). |\n| `PATCH` | `/api/v1/suppliers/:id/approve-update` | Approve a supplier's pending profile update request (admin only). |\n| `PATCH` | `/api/v1/suppliers/:id/reject-update` | Reject a supplier's pending profile update request (admin only). |\n| `GET` | `/api/v1/suppliers/:id/reject-reason` | Retrieve the reason why a supplier's registration was rejected. |\n| `GET` | `/api/v1/suppliers/:id/reject-update-reason` | Retrieve the reason why a supplier's profile update was rejected. |\n| `PATCH` | `/api/v1/suppliers/me` | Allow an authenticated supplier to update their own profile information. |\n\n### Example Requests\n\n**Get All Suppliers** — `GET {{base_url}}/api/v1/suppliers`\n\nNo request body required. Returns a list of all registered suppliers.\n\n**Get Supplier by ID** — `GET {{base_url}}/api/v1/suppliers/:id`\n\nReplace `:id` with the supplier's numeric ID (e.g. `/api/v1/suppliers/1`).\n\n**Approve Supplier Registration** — `PATCH {{base_url}}/api/v1/suppliers/:id/approve`\n\nNo request body required. Admin only. Approves the supplier's pending registration.\n\n**Reject Supplier Registration** — `PATCH {{base_url}}/api/v1/suppliers/:id/reject`\n\n```json\n{\n  \"reason\": \"Incomplete documentation provided.\" // required\n}\n```\n\n**Approve Supplier Update** — `PATCH {{base_url}}/api/v1/suppliers/:id/approve-update`\n\nNo request body required. Admin only. Approves the supplier's pending profile update.\n\n**Reject Supplier Update** — `PATCH {{base_url}}/api/v1/suppliers/:id/reject-update`\n\n```json\n{\n  \"reason\": \"Invalid business address submitted.\" // required\n}\n```\n\n**Update Supplier Profile** — `PATCH {{base_url}}/api/v1/suppliers/me`\n\n```json\n{\n  \"name\": \"Updated Supplier Name\",   // optional\n  \"website\": \"https://supplier.com\", // optional\n  \"phone\": \"+1234567890\"             // optional\n}\n```\n\n### Authentication\nAll endpoints require a valid Bearer token. Admin-level endpoints (approve, reject, pending queues) require admin privileges."
+    },
+    {
+      "name": "Request Products",
+      "item": [
+        {
+          "name": "Get All Request Products",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Request Product",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Request Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Nike Air Max 270\",\r\n  \"description\": \"Comfortable running shoes with breathable mesh upper and lightweight cushioning for everyday use.\",\r\n  \"quantity\": 50,\r\n  \"price\": 3499.99,\r\n  \"imageCover\": \"http://res.cloudinary.com/dbrekuffj/image/upload/v1785502996/Request-Product-Covers/Samsung%20Galaxy%20S23.png\",\r\n  \"discount\": 10,\r\n  \"categoryId\": 1,\r\n  \"subCategoryId\": 1,\r\n  \"brandId\": 1,\r\n  \"colorIds\": [1]\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Request Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"lap\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/8",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Request Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "4"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Request Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/accept/3",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "accept",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Request Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"tes2t\",\r\n    \"details\": \"please add the uni\",\r\n    \"quantity\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/reject/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "reject",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Approved Request Products",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/approved-request-products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "approved-request-products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Rejected Request Products",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/rejected-request-products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "rejected-request-products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pending Request Products",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/request-products/pending-request-products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "request-products",
+                "pending-request-products"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Request Products\n\nThis folder covers product request management endpoints. Product requests represent procurement or restocking requests submitted within the system — typically used by admins or internal staff to request new products from suppliers. Full CRUD operations are supported.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/request-products` | Retrieve a list of all product requests. |\n| `GET` | `/api/v1/request-products/:id` | Retrieve the details of a specific product request by its ID. |\n| `POST` | `/api/v1/request-products` | Submit a new product request. |\n| `PATCH` | `/api/v1/request-products/:id` | Update the details or status of an existing product request. |\n| `DELETE` | `/api/v1/request-products/:id` | Delete a product request by its ID. |\n\n### Example Requests\n\n**Create Request Product** — `POST {{base_url}}/api/v1/request-products`\n\n``` json\n{\n  \"title\": \"Wireless Headphones\",   // required\n  \"details\": \"Need 50 units of noise-cancelling wireless headphones\", // required, min 5 chars\n  \"quantity\": 50,                   // required, number\n  \"category\": \"Electronics\"         // optional\n}\n\n ```\n\n**Update Request Product** — `PATCH {{base_url}}/api/v1/request-products/:id`\n\n``` json\n{\n  \"title\": \"Wireless Headphones\",   // optional\n  \"details\": \"Need 50 units of noise-cancelling wireless headphones\", // optional, min 5 chars\n  \"quantity\": 50,                   // optional, number\n  \"category\": \"Electronics\"         // optional\n}\n\n ```"
+    },
+    {
+      "name": "Taxes",
+      "item": [
+        {
+          "name": "Get All Taxes",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/taxes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "taxes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create And Update Tax",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"taxPrice\": 70,\r\n    \"shippingPrice\": 60\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/taxes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "taxes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Tax",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/taxes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "taxes"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Taxes\n\nThis folder covers tax configuration endpoints for the e-commerce platform. It provides a simplified tax management model where a single global tax record can be created or updated, and reset when needed. Tax values are applied to product pricing and order totals at checkout.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/taxes` | Retrieve the current tax configuration. |\n| `POST` | `/api/v1/taxes` | Create or update the global tax settings (upsert behavior). |\n| `DELETE` | `/api/v1/taxes` | Reset the tax configuration to its default state. |\n\n### Example Requests\n\n**Create And Update Tax** — `POST {{base_url}}/api/v1/taxes`\n\n``` json\n{\n  \"taxPrice\": 15,        // optional, number\n  \"shippingPrice\": 25    // optional, number\n}\n\n ```"
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "price[lte]",
+                  "value": "12",
+                  "disabled": true
+                },
+                {
+                  "key": "price[gte]",
+                  "value": "20000",
+                  "disabled": true
+                },
+                {
+                  "key": "sold[lte]",
+                  "value": "2",
+                  "disabled": true
+                },
+                {
+                  "key": "sold[gte]",
+                  "value": "20000",
+                  "disabled": true
+                },
+                {
+                  "key": "averageRating[gte]",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "averageRating[lte]",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "categoryId",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "subCategoryId",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "brandId",
+                  "value": null,
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "quantity",
+                  "disabled": true
+                },
+                {
+                  "key": "term",
+                  "value": "DeSc",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"tawfik@gmail.com\",\r\n    \"password\": \"tawfikahmed01226921531\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Sony Headphones WH-1000XM4\", \r\n  \"description\": \"Noise-cancelling wireless headphones with premium sound quality.\", \r\n  \"quantity\": 35, \r\n  \"price\": 350, \r\n  \"priceAfterDiscount\": 320, \r\n  \"imageCover\": \"https://example.com/images/products/sony_headphones.jpg\", \r\n  \"images\": [\"https://example.com/images/products/sony_headphones_1.jpg\",\"https://example.com/images/products/sony_headphones_2.jpg\"], \r\n  \"colors\": [\"black\", \"silver\"], \r\n  \"sold\": 0, \r\n  \"categoryId\": 1, \r\n  \"subCategoryId\": 3, \r\n  \"brandId\": 5\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"price\": 0\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Products\n\nThis folder covers the core product catalog management endpoints. Products are the central entity of the e-commerce platform, and these endpoints support the full lifecycle of a product — from creation and listing to updates and deletion. Admin users manage the catalog, while all users can browse products.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/products` | Retrieve a paginated list of all products in the catalog. |\n| `GET` | `/api/v1/products/:id` | Retrieve the full details of a specific product by its ID. |\n| `POST` | `/api/v1/products` | Create a new product and add it to the catalog (admin only). |\n| `PATCH` | `/api/v1/products/:id` | Update the details, pricing, or stock of an existing product (admin only). |\n| `DELETE` | `/api/v1/products/:id` | Remove a product from the catalog (admin only). |\n\n### Example Requests\n\n**Create Product** — `POST {{base_url}}/api/v1/products`\n\n``` json\n{\n  \"title\": \"iPhone 15 Pro\",                                    // required, 3–150 chars\n  \"description\": \"Latest Apple flagship with A17 Pro chip and titanium design\", // required, min 20 chars\n  \"quantity\": 100,                                             // required, number >= 1\n  \"price\": 999,                                                // required, number >= 1\n  \"discount\": 50,                                              // required, number >= 1\n  \"imageCover\": \"https://example.com/iphone15-cover.jpg\",     // required, valid URL\n  \"categoryId\": 1,                                             // required, number\n  \"subCategoryId\": 2,                                          // required, number\n  \"brandId\": 3,                                                // required, number\n  \"images\": [                                                  // optional, array of valid URLs\n    \"https://example.com/iphone15-1.jpg\",\n    \"https://example.com/iphone15-2.jpg\"\n  ],\n  \"sold\": 0,                                                   // optional, number\n  \"colors\": [\"Space Black\", \"Natural Titanium\", \"White\"]       // optional, array of strings\n}\n\n ```\n\n**Update Product** — `PATCH {{base_url}}/api/v1/products/:id`\n\n``` json\n{\n  \"title\": \"iPhone 15 Pro\",                                    // optional, 3–150 chars\n  \"description\": \"Latest Apple flagship with A17 Pro chip and titanium design\", // optional, min 20 chars\n  \"quantity\": 100,                                             // optional, number >= 1\n  \"price\": 999,                                                // optional, number >= 1\n  \"discount\": 50,                                              // optional, number >= 1\n  \"imageCover\": \"https://example.com/iphone15-cover.jpg\",     // optional, valid URL\n  \"categoryId\": 1,                                             // optional, number\n  \"subCategoryId\": 2,                                          // optional, number\n  \"brandId\": 3,                                                // optional, number\n  \"images\": [                                                  // optional, array of valid URLs\n    \"https://example.com/iphone15-1.jpg\",\n    \"https://example.com/iphone15-2.jpg\"\n  ],\n  \"sold\": 0,                                                   // optional, number\n  \"colors\": [\"Space Black\", \"Natural Titanium\", \"White\"]       // optional, array of strings\n}\n\n ```"
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get All Product Reviews",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/reviews/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product Review",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/reviews/1/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                "1",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product Review",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product Review",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Face Cream\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/6",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "6"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product Review",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"electronics\",\r\n    \"image\": \"https://ar.pngtree.com/free-backgrounds-photos/%D8%A7%D9%84%D8%A3%D8%AC%D9%87%D8%B2%D8%A9-%D8%A7%D9%84%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A9\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Reviews\n\nThis folder covers product review management endpoints. Reviews allow authenticated customers to share feedback and ratings on products they have purchased. These endpoints support creating, reading, updating, and deleting reviews, helping maintain product credibility and customer trust.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/reviews/:productId` | Retrieve all reviews for a specific product. |\n| `GET` | `/api/v1/reviews/:productId/:reviewId` | Retrieve a specific review for a product by review ID. |\n| `POST` | `/api/v1/reviews` | Submit a new review for a product (authenticated users only). |\n| `PATCH` | `/api/v1/products/:id` | Update an existing product review. |\n| `DELETE` | `/api/v1/products/:id` | Delete a product review. |\n\n### Example Requests\n\n**Create Product Review** — `POST {{base_url}}/api/v1/reviews`\n\n``` json\n{\n  \"productId\": 1,                                    // required, number\n  \"rating\": 5,                                       // required, number 1–5\n  \"reviewText\": \"Excellent product, highly recommend!\" // optional, 3–500 chars\n}\n\n ```\n\n**Update Product Review** — `PATCH {{base_url}}/api/v1/reviews/:id`\n\n``` json\n{\n  \"productId\": 1,                                    // optional, number\n  \"rating\": 4,                                       // optional, number 1–5\n  \"reviewText\": \"Updated review: still a great product\" // optional, 3–500 chars\n}\n\n ```"
+    },
+    {
+      "name": "Carts",
+      "item": [
+        {
+          "name": "Create Cart Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"quantity\": 2}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"quantity\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/items/9",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "items",
+                "9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Cart Item",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"quantity\": 4\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/items/9",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "items",
+                "9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Card",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Apply Coupon",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Coupon1\",\r\n    \"expireDate\": \"2026-06-19\",\r\n    \"discount\": 2\r\n}   "
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/coupons/coupon1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "coupons",
+                "coupon1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Carts\n\nThis folder covers shopping cart management endpoints. The cart is the central component of the checkout flow, allowing authenticated users to add, update, and remove items, as well as apply discount coupons before placing an order. Each user has their own cart accessible via the `/me` route.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/api/v1/carts/me` | Retrieve the current user's active cart, including all items and totals. |\n| `POST` | `/api/v1/carts/:cartId` | Add a new item to the specified cart. |\n| `PATCH` | `/api/v1/carts/items/:itemId` | Update the quantity or options of a specific cart item. |\n| `DELETE` | `/api/v1/carts/items/:itemId` | Remove a specific item from the cart. |\n| `POST` | `/api/v1/carts/coupons/:couponCode` | Apply a discount coupon to the current cart. |\n\n### Example Requests\n\n**Create Cart Item** — `POST {{base_url}}/api/v1/carts/:productId`\n\n``` json\n{\n  \"quantity\": 2  // required, number >= 1 (default: 1)\n}\n\n ```\n\n**Update Cart Item** — `PATCH {{base_url}}/api/v1/carts/items/:itemId`\n\n``` json\n{\n  \"quantity\": 3  // optional, number >= 1 (default: 1)\n}\n\n ```"
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order (Cash)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"phone\": \"01226921531\",\r\n    \"country\": \"Egypt\",\r\n    \"city\": \"Ismailia\",\r\n    \"street\": \"El Talatiny\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/checkout/cash",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "checkout",
+                "cash"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order (Cash)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"isPaid\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/checkout/64",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "checkout",
+                "64"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Order (Card)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"phone\": \"01226921531\",\r\n    \"country\": \"Egypt\",\r\n    \"city\": \"Ismailia\",\r\n    \"street\": \"El Talatiny\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/carts/checkout/card",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "carts",
+                "checkout",
+                "card"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Orders",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"phone\": \"01226921531\",\r\n    \"country\": \"Egypt\",\r\n    \"city\": \"Ismailia\",\r\n    \"street\": \"El Talatiny\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Orders (Admin)",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Orders\n\nThis folder covers order management endpoints. Orders are created from the user's cart at checkout and support two payment methods: cash on delivery and card payment. Authenticated users can view their own order history, while admins can retrieve orders for any specific user.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/v1/carts/checkout/cash` | Place an order using cash on delivery as the payment method. |\n| `POST` | `/api/v1/carts/checkout/card` | Place an order using a card payment method. |\n| `GET` | `/api/v1/orders` | Retrieve the order history of the currently authenticated user. |\n| `GET` | `/api/v1/orders/:userId` | Retrieve all orders for a specific user by their ID (admin only). |\n\n### Example Requests\n\n**Create Order (Cash/Card)** — `POST {{base_url}}/api/v1/carts/checkout/cash` or `/card`\n\n``` json\n{\n  \"phone\": \"+201012345678\",          // required\n  \"country\": \"Egypt\",                // required\n  \"city\": \"Cairo\",                   // required\n  \"street\": \"123 Tahrir Square\",     // required\n  \"alias\": \"Home\",                   // optional\n  \"details\": \"Ring the bell twice\",  // optional\n  \"governorate\": \"Cairo\",            // optional\n  \"postalCode\": \"11511\"              // optional\n}\n\n ```\n\n**Update Order (Admin)** — `PATCH {{base_url}}/api/v1/orders/:id`\n\n``` json\n{\n  \"phone\": \"+201012345678\",          // optional\n  \"country\": \"Egypt\",                // optional\n  \"city\": \"Cairo\",                   // optional\n  \"street\": \"123 Tahrir Square\",     // optional\n  \"alias\": \"Home\",                   // optional\n  \"details\": \"Ring the bell twice\",  // optional\n  \"governorate\": \"Cairo\",            // optional\n  \"postalCode\": \"11511\",             // optional\n  \"isPaid\": true                     // optional, boolean (admin only)\n}\n\n ```"
+    },
+    {
+      "name": "Upload-Images",
+      "item": [
+        {
+          "name": "Upload Profile Image",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "d7429230-ca16-4452-8c8c-51f3bfe76c3e",
+                  "src": "/C:/Users/tawfi/Downloads/ph2.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/upload-files/profile-image",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "upload-files",
+                "profile-image"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Product Cover",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "d7429230-ca16-4452-8c8c-51f3bfe76c3e",
+                  "src": "/C:/Users/tawfi/OneDrive/Pictures/Screenshots/Screenshot 2026-07-18 191813.png"
+                },
+                {
+                  "key": "productName",
+                  "value": "Samsung Galaxy S23",
+                  "type": "text",
+                  "uuid": "3ba9c7db-cbed-4460-80f2-804a1cf636fb"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/upload-files/product-cover",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "upload-files",
+                "product-cover"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Request Product Cover Image",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "d7429230-ca16-4452-8c8c-51f3bfe76c3e",
+                  "src": "/C:/Users/tawfi/OneDrive/Pictures/Screenshots/Screenshot 2026-07-23 154103.png"
+                },
+                {
+                  "key": "productName",
+                  "value": "Samsung Galaxy S23",
+                  "type": "text",
+                  "uuid": "3ba9c7db-cbed-4460-80f2-804a1cf636fb"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/upload-files/request-product-cover-image",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "upload-files",
+                "request-product-cover-image"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Product Images (Multiple Images)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file[]",
+                  "type": "file",
+                  "uuid": "d7429230-ca16-4452-8c8c-51f3bfe76c3e",
+                  "src": "/C:/Users/tawfi/Downloads/daily.png"
+                },
+                {
+                  "key": "productName",
+                  "value": "Samsung Galaxy S23",
+                  "type": "text",
+                  "uuid": "31ba0946-6d21-4780-845b-6ac76359d628"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/upload-files/product-images",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "upload-files",
+                "product-images"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Profile Image",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/upload-files/profile-image",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "upload-files",
+                "profile-image"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product Cover",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"productName\": \"Samsung Galaxy S23\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/upload-files/product-cover",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "upload-files",
+                "product-cover"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Selected Product Images (Multiple Images)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"publicIds\": [\r\n    \"Products/Samsung Galaxy S23/e2528d3f-8846-4a9c-af84-9f835a312dc4\",\r\n    \"Products/Samsung Galaxy S23/9d2dfa2c-be14-41f0-87e1-1a5922a7dcc5\",\r\n    \"Products/Samsung Galaxy S23/072ef137-ebe1-400a-b649-ebf99f2c4ef0\"\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/upload-files/product-images",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "upload-files",
+                "product-images"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## Upload Images\n\nThis folder covers file upload and deletion endpoints for managing images across the platform. It supports uploading and removing profile images for users, as well as product cover images and multiple product gallery images. All requests use `multipart/form-data` for file uploads.\n\n### Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/v1/upload-files/profile-image` | Upload a profile picture for the authenticated user. |\n| `POST` | `/api/v1/upload-files/product-cover` | Upload a cover image for a product. |\n| `POST` | `/api/v1/upload-files/product-images` | Upload multiple gallery images for a product. |\n| `DELETE` | `/api/v1/upload-files/profile-image` | Delete the current profile image of the authenticated user. |\n| `DELETE` | `/api/v1/upload-files/product-cover` | Delete the cover image of a product. |\n| `DELETE` | `/api/v1/upload-files/product-images` | Delete selected images from a product's image gallery. |\n\n### Example Requests\n\n**Upload Image** — `POST {{base_url}}/api/v1/upload-files/profile-image` (or `/product-cover`, `/product-images`)\n\n```\nContent-Type: multipart/form-data\nField: file  →  [select image file]   // required, image file\n\n ```\n\n**Delete Endpoints** — No request body needed. Pass the resource identifier as a URL parameter:\n\n```\nDELETE {{base_url}}/api/v1/upload-files/profile-image\nDELETE {{base_url}}/api/v1/upload-files/product-cover\nDELETE {{base_url}}/api/v1/upload-files/product-images\n\n ```"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

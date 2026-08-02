@@ -19,6 +19,7 @@ import { JwtPayloadType } from '../utils/types';
 import { AuthService } from '../auth/auth.service';
 import { Supplier } from '../supplier/entities/supplier.entity';
 import { UserRole } from '../utils/enums';
+import { normalizeText } from '../utils/normalize';
 
 @Injectable()
 export class UserService {
@@ -282,7 +283,7 @@ export class UserService {
 
         const updatedUser = this.userRepository.merge(user, dto);
         await this.userRepository.save(updatedUser);
-        console.log("hi");
+        
         return {
           ok: true,
           message:

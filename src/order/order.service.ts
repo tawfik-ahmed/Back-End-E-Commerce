@@ -246,7 +246,7 @@ export class OrderService {
     }
 
     await this.mailerService.sendMail({
-      from: `Back-End E-Commerce NestJS <${this.configService.get<string>('SMTP_USER')}>`,
+      from: `Back-End E-Commerce NestJS <${this.configService.get<string>('GMAIL_USER')}>`,
       to: order.user.email,
       subject: 'Back-End E-Commerce NestJS - Order Paid Successfully (Cash)',
       html: `<div>
@@ -322,7 +322,7 @@ export class OrderService {
         ]);
 
         await this.mailerService.sendMail({
-          from: `Back-End E-Commerce NestJS <${this.configService.get<string>('SMTP_USER')}>`,
+          from: `Back-End E-Commerce NestJS <${this.configService.get<string>('GMAIL_USER')}>`,
           to: order.user.email,
           subject: 'Order Paid Successfully',
           html: `<h1>Paid</h1>`,

@@ -66,7 +66,7 @@ BACK-END E-COMMERCE
 ├── 📁 docs                   # Project blueprints, design assets & API testing documentation
 │   ├── 📁 images             # Design assets for the README
 │   └── 📁 postman            # Embedded API documentation environment sandbox
-│       ├── 📁 collections    # Segmented JSON collections covering full module routes
+│       ├── 📄 collection.json    # JSON collections covering full module routes
 │       └── 📄 environment.json # Active baseline target environment parameters
 ├── 📁 src                    # Main application source code
 │   ├── 📁 auth               # Credentials authentication & OTP password reset
@@ -155,10 +155,10 @@ npm install
    Create a `.env` file inside the root directory of the application and map the active credentials exactly as structured below:
 
 ```env
-PORT=3000
+# NODE_ENV
 NODE_ENV=development
 
-# DB Settings
+# DB
 DATABASE_TYPE=mysql
 DATABASE_HOST=localhost
 DATABASE_PORT=
@@ -166,29 +166,29 @@ DATABASE_USERNAME=root
 DATABASE_NAME=
 DATABASE_PASSWORD=
 
-# JWT Architecture Secrets
+# JWT
 JWT_SECRET=
 JWT_EXPIRES_IN=
 JWT_REFRESH_TOKEN_SECRET=
 JWT_REFRESH_TOKEN_EXPIRES_IN=
 
-# Hash
+# Hash  
 SALT=
 
-# Mailer Configurations
-SMTP_USER=
-SMTP_PASSWORD=
+# Mailer SMTP
+GMAIL_USER=
+GMAIL_APP_PASSWORD=
 
-# Stripe Commercial Credentials
+# Stripe
 STRIPE_SECRET_KEY=
 ENDPOINT_SECRET=
 
-# Cloudinary Media Storage Accounts
+# Cloudinary
 CLOUDINARY_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 
-# OAuth Social Credentials
+# OAuth
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
