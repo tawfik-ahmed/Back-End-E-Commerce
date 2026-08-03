@@ -4,13 +4,12 @@ A production-ready RESTful API built with **NestJS**, **TypeORM**, and **MySQL**
 
 ---
 
-## 📸 System Architecture & Database Design
+##  Database Diagram
 
-Here are the blueprints showcasing how the system modules interact and how the database entities are structurally related:
+Here are the blueprints showcasing how database entities are structurally related:
 
 <p align="center">
-  <img src="docs/images/system-design.png" alt="System Design" width="48%" />
-  <img src="docs/images/database-diagram.png" alt="Database Diagram" width="48%" />
+  <img src="docs/images/DB-Diagram.png" alt="Database Diagram" width="90%" />
 </p>
 
 ---
