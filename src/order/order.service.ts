@@ -246,13 +246,13 @@ export class OrderService {
     }
 
     await this.mailerService.sendMail({
-      from: `Back-End E-Commerce NestJS <${this.configService.get<string>('GMAIL_USER')}>`,
+      from: `Zoodle E-Commerce <${this.configService.get<string>('GMAIL_USER')}>`,
       to: order.user.email,
-      subject: 'Back-End E-Commerce NestJS - Order Paid Successfully (Cash)',
+      subject: 'Zoodle E-Commerce - Order Paid Successfully (Cash)',
       html: `<div>
         <h1>Order #${order.id} has been paid</h1>
         <p>Thank you for using our service!</p>
-        <p>Best regards,<br/>Back-End E-Commerce NestJS</p>
+        <p>Best regards,<br/>Zoodle E-Commerce</p>
       </div>`,
     });
     return {
@@ -322,7 +322,7 @@ export class OrderService {
         ]);
 
         await this.mailerService.sendMail({
-          from: `Back-End E-Commerce NestJS <${this.configService.get<string>('GMAIL_USER')}>`,
+          from: `Zoodle E-Commerce <${this.configService.get<string>('GMAIL_USER')}>`,
           to: order.user.email,
           subject: 'Order Paid Successfully',
           html: `<h1>Paid</h1>`,

@@ -1,10 +1,10 @@
-# 🛒 Back-End E-Commerce Platform
+# 🛒 Zoodle E-Commerce (Back-End) Platform
 
 A production-ready RESTful API built with **NestJS**, **TypeORM**, and **MySQL**. The system is designed using a clean, modular architecture, handling everything from secure authentication and complex catalog relations to a dynamic cart system and Stripe payment integration.
 
 ---
 
-##  Database Diagram
+## Database Diagram
 
 Here are the blueprints showcasing how database entities are structurally related:
 
@@ -60,7 +60,7 @@ Here are the blueprints showcasing how database entities are structurally relate
 ## 📂 Project Structure
 
 ```text
-BACK-END E-COMMERCE
+Zoodle E-Commerce (Back-End)
 ├── 📁 dist                   # Compiled production code
 ├── 📁 docs                   # Project blueprints, design assets & API testing documentation
 │   ├── 📁 images             # Design assets for the README
@@ -171,7 +171,7 @@ JWT_EXPIRES_IN=
 JWT_REFRESH_TOKEN_SECRET=
 JWT_REFRESH_TOKEN_EXPIRES_IN=
 
-# Hash  
+# Hash
 SALT=
 
 # Mailer SMTP

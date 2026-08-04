@@ -129,9 +129,9 @@ export class AuthService {
     await this.userRepository.save(user);
 
     await this.mailerService.sendMail({
-      from: `Back-End E-Commerce NestJS <${this.config.get<string>('GMAIL_USER')}>`,
+      from: `Zoodle E-Commerce <${this.config.get<string>('GMAIL_USER')}>`,
       to: email,
-      subject: 'Back-End E-Commerce NestJS - Reset Password',
+      subject: 'Zoodle E-Commerce - Reset Password',
       html: `<div>
         <h1>Forgot your password? If you didn't request a password reset, you can safely ignore this email.</h1>
         <p>Verification Code: 
@@ -139,7 +139,7 @@ export class AuthService {
         </p>
         <p>Don't share this code with anyone.</p>
         <p>Thank you for using our service!</p>
-        <p>Best regards,<br/>Back-End E-Commerce NestJS</p>
+        <p>Best regards,<br/>Zoodle E-Commerce</p>
       </div>`,
     });
 
